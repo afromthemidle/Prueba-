@@ -3,7 +3,7 @@ import { initialInvestments, Investment } from './data/investments';
 import { InvestmentList } from './components/InvestmentList';
 import { DashboardStats } from './components/DashboardStats';
 import { AISuggestions } from './components/AISuggestions';
-import { LayoutDashboard, Wallet, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Wallet, Sparkles, TrendingUp } from 'lucide-react';
 import { useLanguage } from './i18n/LanguageContext';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -97,11 +97,11 @@ export default function App() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm border border-indigo-200/50">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
+              <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">{t("Wealth Tracker")}</h1>
             </div>
             <div className="flex items-center gap-2">
               <button
