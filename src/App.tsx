@@ -86,33 +86,55 @@ export default function App() {
     });
   };
 
-  const handleAddMultiple = (newInvs: Investment[]) => {
-    setInvestments(prev => [...newInvs, ...prev]);
+  const handleAddMultiple = (newInvs: (Investment & { amount?: number })[], type: 'partial' | 'total') => {
+    const cleanInvs = newInvs.map(({ amount, ...inv }) => inv);
+    
+    if (type === 'total') {
+      setInvestments(cleanInvs);
+      const newAmounts: Record<string, number> = {};
+      newInvs.forEach(inv => {
+        if (inv.amount !== undefined && inv.amount > 0) {
+          newAmounts[inv.id] = inv.amount;
+        }
+      });
+      setAmounts(newAmounts);
+    } else {
+      setInvestments(prev => [...cleanInvs, ...prev]);
+      setAmounts(prev => {
+        const newAmounts = { ...prev };
+        newInvs.forEach(inv => {
+          if (inv.amount !== undefined && inv.amount > 0) {
+            newAmounts[inv.id] = inv.amount;
+          }
+        });
+        return newAmounts;
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Toaster position="top-right" />
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm border border-indigo-200/50">
-                <TrendingUp className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm">
+                <TrendingUp className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">{t("Wealth Tracker")}</h1>
+              <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${language === 'en' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <span>🇺🇸</span> EN
               </button>
               <button
                 onClick={() => setLanguage('es')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${language === 'es' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <span>🇪🇸</span> ES
               </button>
@@ -123,39 +145,54 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-slate-200/50 p-1 rounded-xl mb-8 max-w-md mx-auto sm:mx-0">
+        <div className="flex space-x-6 border-b border-slate-200 mb-8">
           <button
             onClick={() => setActiveTab('portfolio')}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            className={`pb-4 text-sm font-medium transition-colors relative ${
               activeTab === 'portfolio' 
-                ? 'bg-white text-slate-900 shadow-sm' 
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'text-slate-900' 
+                : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Wallet className="w-4 h-4" />
-            {t("Portfolio")}
+            <div className="flex items-center gap-2">
+              <Wallet className="w-4 h-4" />
+              {t("Portfolio")}
+            </div>
+            {activeTab === 'portfolio' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+            )}
           </button>
           <button
             onClick={() => setActiveTab('insights')}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            className={`pb-4 text-sm font-medium transition-colors relative ${
               activeTab === 'insights' 
-                ? 'bg-white text-slate-900 shadow-sm' 
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'text-slate-900' 
+                : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4" />
-            {t("Insights")}
+            <div className="flex items-center gap-2">
+              <LayoutDashboard className="w-4 h-4" />
+              {t("Insights")}
+            </div>
+            {activeTab === 'insights' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+            )}
           </button>
           <button
             onClick={() => setActiveTab('suggestions')}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+            className={`pb-4 text-sm font-medium transition-colors relative ${
               activeTab === 'suggestions' 
-                ? 'bg-white text-slate-900 shadow-sm' 
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                ? 'text-slate-900' 
+                : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Sparkles className="w-4 h-4" />
-            {t("AI Ideas")}
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              {t("Investment Ideas")}
+            </div>
+            {activeTab === 'suggestions' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+            )}
           </button>
         </div>
 

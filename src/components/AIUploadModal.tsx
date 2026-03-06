@@ -7,13 +7,14 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (investments: Investment[]) => void;
+  onSuccess: (investments: (Investment & { amount?: number })[], type: 'partial' | 'total') => void;
 }
 
 export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [importType, setImportType] = useState<'partial' | 'total'>('partial');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -53,6 +54,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
                   - country: string (default to 'Global' if unknown)
                   - type: 'Fixed' or 'Variable'
                   - sector: 'Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', or 'Others'
+                  - amount: number (the balance, value, or amount invested. If not found, omit or use 0)
                   `
                 }
               ]
@@ -69,7 +71,8 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
                     currency: { type: Type.STRING },
                     country: { type: Type.STRING },
                     type: { type: Type.STRING },
-                    sector: { type: Type.STRING }
+                    sector: { type: Type.STRING },
+                    amount: { type: Type.NUMBER }
                   },
                   required: ["name", "rate", "currency", "country", "type", "sector"]
                 }
@@ -87,7 +90,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
               type: ['Fixed', 'Variable'].includes(inv.type) ? inv.type : 'Fixed',
               sector: ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].includes(inv.sector) ? inv.sector : 'Others',
             }));
-            onSuccess(newInvestments);
+            onSuccess(newInvestments, importType);
             onClose();
           } else {
             throw new Error("No data extracted");
@@ -106,17 +109,17 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden p-6 relative border border-slate-200">
+        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
           <X className="w-5 h-5" />
         </button>
         
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-slate-900 text-white rounded-lg flex items-center justify-center mx-auto mb-4">
             <FileText className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-semibold text-slate-900">{t("Import Investments")}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t("Import Investments")}</h2>
           <p className="text-sm text-slate-500 mt-1">{t("Upload a document, image, or spreadsheet. AI will automatically extract your investments.")}</p>
         </div>
 
@@ -126,21 +129,50 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
           </div>
         )}
 
+        <div className="mb-6 space-y-3">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("Import Type")}</label>
+          <div 
+            className={`p-3 rounded-lg border cursor-pointer transition-colors ${importType === 'partial' ? 'border-slate-900 bg-slate-50' : 'border-slate-200 hover:border-slate-300'}`}
+            onClick={() => setImportType('partial')}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${importType === 'partial' ? 'border-slate-900' : 'border-slate-300'}`}>
+                {importType === 'partial' && <div className="w-2 h-2 rounded-full bg-slate-900" />}
+              </div>
+              <span className="font-semibold text-sm text-slate-900">{t("Partial Import")}</span>
+            </div>
+            <p className="text-xs text-slate-500 ml-6">{t("New records will be added to the current portfolio.")}</p>
+          </div>
+          
+          <div 
+            className={`p-3 rounded-lg border cursor-pointer transition-colors ${importType === 'total' ? 'border-slate-900 bg-slate-50' : 'border-slate-200 hover:border-slate-300'}`}
+            onClick={() => setImportType('total')}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${importType === 'total' ? 'border-slate-900' : 'border-slate-300'}`}>
+                {importType === 'total' && <div className="w-2 h-2 rounded-full bg-slate-900" />}
+              </div>
+              <span className="font-semibold text-sm text-slate-900">{t("Total Import")}</span>
+            </div>
+            <p className="text-xs text-slate-500 ml-6">{t("All current records will be deleted and replaced with the new ones.")}</p>
+          </div>
+        </div>
+
         <div 
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${loading ? 'border-slate-200 bg-slate-50' : 'border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer'}`}
+          className={`border border-dashed rounded-lg p-8 text-center transition-colors ${loading ? 'border-slate-200 bg-slate-50' : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50 cursor-pointer'}`}
           onClick={() => !loading && fileInputRef.current?.click()}
         >
           {loading ? (
             <div className="flex flex-col items-center">
-              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-2" />
-              <p className="text-sm font-medium text-slate-700">{t("Analyzing file with AI...")}</p>
+              <Loader2 className="w-8 h-8 text-slate-900 animate-spin mb-3" />
+              <p className="text-sm font-semibold text-slate-900">{t("Analyzing file with AI...")}</p>
               <p className="text-xs text-slate-500 mt-1">{t("This might take a few seconds")}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center">
-              <Upload className="w-8 h-8 text-indigo-500 mb-2" />
-              <p className="text-sm font-medium text-slate-700">{t("Click to upload file")}</p>
-              <p className="text-xs text-slate-500 mt-1">{t("PDF, Image, CSV, TXT")}</p>
+              <Upload className="w-8 h-8 text-slate-400 mb-3" />
+              <p className="text-sm font-semibold text-slate-900">{t("Click to upload file")}</p>
+              <p className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 mt-2">{t("PDF, Image, CSV, TXT")}</p>
             </div>
           )}
           <input 

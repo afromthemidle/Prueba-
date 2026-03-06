@@ -89,12 +89,12 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
 
   if (stats.totalUSD === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+      <div className="flex flex-col items-center justify-center h-[400px] bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-4">
           <span className="text-2xl">💰</span>
         </div>
-        <h2 className="text-xl font-semibold text-slate-900 mb-2">{t("No Investments Yet")}</h2>
-        <p className="text-slate-500 max-w-md">
+        <h2 className="text-lg font-semibold text-slate-900 mb-2">{t("No Investments Yet")}</h2>
+        <p className="text-sm text-slate-500 max-w-md">
           {t("Enter amounts in the Portfolio tab to see your wealth distribution, average interest rates, and detailed statistics.")}
         </p>
       </div>
@@ -117,13 +117,13 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
     <div className="space-y-6 pb-20">
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <p className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-1">{t("Total Net Worth")}</p>
-          <p className="text-4xl font-light text-slate-900 tracking-tight">{formatCurrency(stats.totalUSD)}</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Total Net Worth")}</p>
+          <p className="text-4xl font-light text-slate-900 tracking-tight font-mono">{formatCurrency(stats.totalUSD)}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <p className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-1">{t("Average Weighted Interest")}</p>
-          <p className={`text-4xl font-light tracking-tight ${stats.avgInterest >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Average Weighted Interest")}</p>
+          <p className={`text-4xl font-light tracking-tight font-mono ${stats.avgInterest >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
             {formatPercent(stats.avgInterest)}
           </p>
         </div>
@@ -132,8 +132,8 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sector Distribution */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">{t("Distribution by Sector")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Sector")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -158,8 +158,8 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
         </div>
 
         {/* Type Distribution */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">{t("Fixed vs Variable Income")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Fixed vs Variable Income")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -184,8 +184,8 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
         </div>
 
         {/* Currency Distribution */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">{t("Distribution by Currency")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Currency")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -210,8 +210,8 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
         </div>
 
         {/* Country Distribution */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-6">{t("Distribution by Country")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Country")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.countryData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -229,23 +229,23 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
       {/* Top Investments Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Largest Investments */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">{t("Largest Investments (by Amount)")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Largest Investments (by Amount)")}</h3>
           <div className="space-y-3">
             {stats.topByAmount.map((inv, idx) => (
-              <div key={inv.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div key={inv.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                  <div className="w-6 h-6 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs">
                     {idx + 1}
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">{inv.name}</p>
-                    <p className="text-xs text-slate-500">{t(inv.sector)} • {inv.country}</p>
+                    <p className="font-medium text-sm text-slate-900">{inv.name}</p>
+                    <p className="text-[10px] uppercase text-slate-500">{t(inv.sector)} • {inv.country}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-slate-900">{formatCurrency(inv.amountUSD)}</p>
-                  <p className="text-xs text-emerald-600 font-medium">{formatPercent(inv.rate)}</p>
+                  <p className="font-semibold text-sm text-slate-900 font-mono">{formatCurrency(inv.amountUSD)}</p>
+                  <p className="text-[10px] text-emerald-600 font-medium">{formatPercent(inv.rate)}</p>
                 </div>
               </div>
             ))}
@@ -253,23 +253,23 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
         </div>
 
         {/* Top Paying Investments */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">{t("Highest Yielding Active Investments")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Highest Yielding Active Investments")}</h3>
           <div className="space-y-3">
             {stats.topPaying.map((inv, idx) => (
-              <div key={inv.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div key={inv.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                  <div className="w-6 h-6 rounded bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
                     {idx + 1}
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">{inv.name}</p>
-                    <p className="text-xs text-slate-500">{t(inv.sector)} • {inv.country}</p>
+                    <p className="font-medium text-sm text-slate-900">{inv.name}</p>
+                    <p className="text-[10px] uppercase text-slate-500">{t(inv.sector)} • {inv.country}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-emerald-600">{formatPercent(inv.rate)}</p>
-                  <p className="text-xs text-slate-500 font-mono">{formatCurrency(inv.amount, inv.currency)}</p>
+                  <p className="font-semibold text-sm text-emerald-600 font-mono">{formatPercent(inv.rate)}</p>
+                  <p className="text-[10px] text-slate-500 font-mono">{formatCurrency(inv.amount, inv.currency)}</p>
                 </div>
               </div>
             ))}
@@ -277,28 +277,28 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
         </div>
 
         {/* Upcoming Maturities */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">{t("Upcoming Maturities")}</h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Upcoming Maturities")}</h3>
           <div className="space-y-3">
             {stats.upcomingMaturities.length > 0 ? stats.upcomingMaturities.map((inv, idx) => {
               const daysLeft = Math.ceil((new Date(inv.maturityDate!).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
               const isUrgent = daysLeft <= 7;
               return (
-                <div key={inv.id} className={`flex items-center justify-between p-3 rounded-xl border ${isUrgent ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100'}`}>
+                <div key={inv.id} className={`flex items-center justify-between p-3 rounded-lg border ${isUrgent ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100'}`}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isUrgent ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-700'}`}>
+                    <div className={`w-6 h-6 rounded flex items-center justify-center font-bold text-xs ${isUrgent ? 'bg-orange-100 text-orange-700' : 'bg-slate-200 text-slate-700'}`}>
                       {idx + 1}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{inv.name}</p>
-                      <p className="text-xs text-slate-500">{new Date(inv.maturityDate!).toLocaleDateString()}</p>
+                      <p className="font-medium text-sm text-slate-900">{inv.name}</p>
+                      <p className="text-[10px] uppercase text-slate-500">{new Date(inv.maturityDate!).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-semibold ${isUrgent ? 'text-orange-600' : 'text-slate-900'}`}>
+                    <p className={`font-semibold text-sm ${isUrgent ? 'text-orange-600' : 'text-slate-900'}`}>
                       {daysLeft === 0 ? t("Today") : t("In {days} days").replace('{days}', daysLeft.toString())}
                     </p>
-                    <p className="text-xs text-slate-500 font-mono">{formatCurrency(inv.amount, inv.currency)}</p>
+                    <p className="text-[10px] text-slate-500 font-mono">{formatCurrency(inv.amount, inv.currency)}</p>
                   </div>
                 </div>
               );

@@ -48,29 +48,29 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
         <div className="flex justify-between items-center p-4 border-b border-slate-100">
           <h2 className="text-lg font-semibold text-slate-900">
             {initialData ? t('Edit Investment') : t('Add Investment')}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">{t("Name")}</label>
-            <input required type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Name")}</label>
+            <input required type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Rate (%)")}</label>
-              <input required type="number" step="0.01" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={(formData.rate || 0) * 100} onChange={e => setFormData({...formData, rate: parseFloat(e.target.value) / 100})} />
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Rate (%)")}</label>
+              <input required type="number" step="0.01" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={(formData.rate || 0) * 100} onChange={e => setFormData({...formData, rate: parseFloat(e.target.value) / 100})} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Currency")}</label>
-              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.currency || 'USD'} onChange={e => setFormData({...formData, currency: e.target.value as 'USD'|'EUR'})}>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency")}</label>
+              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.currency || 'USD'} onChange={e => setFormData({...formData, currency: e.target.value as 'USD'|'EUR'})}>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
               </select>
@@ -78,12 +78,12 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Country")}</label>
-              <input required type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.country || ''} onChange={e => setFormData({...formData, country: e.target.value})} />
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Country")}</label>
+              <input required type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.country || ''} onChange={e => setFormData({...formData, country: e.target.value})} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Type")}</label>
-              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.type || 'Fixed'} onChange={e => setFormData({...formData, type: e.target.value as InvestmentType})}>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Type")}</label>
+              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.type || 'Fixed'} onChange={e => setFormData({...formData, type: e.target.value as InvestmentType})}>
                 <option value="Fixed">{t("Fixed Income")}</option>
                 <option value="Variable">{t("Variable Income")}</option>
               </select>
@@ -91,21 +91,21 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Sector")}</label>
-              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.sector || 'Others'} onChange={e => setFormData({...formData, sector: e.target.value as InvestmentSector})}>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Sector")}</label>
+              <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.sector || 'Others'} onChange={e => setFormData({...formData, sector: e.target.value as InvestmentSector})}>
                 {['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].map(s => (
                   <option key={s} value={s}>{t(s)}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">{t("Maturity Date")}</label>
-              <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" value={formData.maturityDate || ''} onChange={e => setFormData({...formData, maturityDate: e.target.value})} />
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Maturity Date")}</label>
+              <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.maturityDate || ''} onChange={e => setFormData({...formData, maturityDate: e.target.value})} />
             </div>
           </div>
-          <div className="pt-4 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">{t("Cancel")}</button>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">{t("Save")}</button>
+          <div className="pt-4 flex justify-end gap-3">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg font-medium transition-colors text-sm">{t("Cancel")}</button>
+            <button type="submit" className="flex-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium transition-colors text-sm">{t("Save")}</button>
           </div>
         </form>
       </div>

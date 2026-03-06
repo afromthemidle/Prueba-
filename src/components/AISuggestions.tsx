@@ -85,22 +85,22 @@ export function AISuggestions() {
   const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center">
           <Sparkles className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">{t("AI Investment Suggestions")}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t("AI Investment Suggestions")}</h2>
           <p className="text-sm text-slate-500">{t("Discover new opportunities tailored to your preferences.")}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">{t("Investment Type")}</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Investment Type")}</label>
           <select
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors text-sm"
             value={type}
             onChange={(e) => setType(e.target.value as InvestmentType | 'Any')}
           >
@@ -110,9 +110,9 @@ export function AISuggestions() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">{t("Sector")}</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Sector")}</label>
           <select
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors text-sm"
             value={sector}
             onChange={(e) => setSector(e.target.value as InvestmentSector | 'Any')}
           >
@@ -121,12 +121,12 @@ export function AISuggestions() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">{t("Country")}</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Country")}</label>
           <input
             type="text"
             list="countries"
             placeholder={t("e.g. Spain, USA, Global")}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors text-sm"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
           />
@@ -135,9 +135,9 @@ export function AISuggestions() {
           </datalist>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">{t("Currency")}</label>
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency")}</label>
           <select
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50"
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors text-sm"
             value={currency}
             onChange={(e) => setCurrency(e.target.value as 'USD' | 'EUR' | 'Any')}
           >
@@ -151,7 +151,7 @@ export function AISuggestions() {
       <button
         onClick={handleSuggest}
         disabled={loading}
-        className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
       >
         {loading ? (
           <>
@@ -174,23 +174,23 @@ export function AISuggestions() {
 
       {suggestions.length > 0 && (
         <div className="mt-8 space-y-4">
-          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">{t("Recommended For You")}</h3>
+          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("Recommended For You")}</h3>
           <div className="grid gap-4">
             {suggestions.map((s, idx) => (
-              <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 transition-colors group">
+              <div key={idx} className="p-4 rounded-lg border border-slate-200 bg-white hover:border-slate-300 transition-colors group">
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-slate-900 text-lg">{s.name}</h4>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-bold bg-emerald-100 text-emerald-800">
+                  <h4 className="font-semibold text-slate-900">{s.name}</h4>
+                  <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100/60">
                     {formatPercent(s.interestRate)}
                   </span>
                 </div>
-                <p className="text-slate-600 text-sm mb-4 leading-relaxed">{s.description}</p>
+                <p className="text-slate-500 text-sm mb-4 leading-relaxed">{s.description}</p>
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                   <div className="flex gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                    <span className="inline-flex items-center px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600">
                       {t(s.type)}
                     </span>
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-indigo-50 text-indigo-700">
+                    <span className="inline-flex items-center px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-wider bg-slate-100 text-slate-600">
                       {t(s.sector)}
                     </span>
                   </div>
@@ -198,9 +198,9 @@ export function AISuggestions() {
                     href={s.website.startsWith('http') ? s.website : `https://${s.website}`}
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-slate-900 hover:text-slate-600 transition-colors uppercase tracking-wider"
                   >
-                    {t("Visit Site")} <ExternalLink className="w-4 h-4" />
+                    {t("Visit Site")} <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
