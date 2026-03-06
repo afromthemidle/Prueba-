@@ -21,3 +21,18 @@ export function formatPercent(value: number) {
     maximumFractionDigits: 2,
   }).format(value);
 }
+
+export function formatDate(dateString: string) {
+  if (!dateString) return '';
+  // Append T12:00:00 to avoid timezone shifts when parsing YYYY-MM-DD
+  const date = new Date(`${dateString}T12:00:00`);
+  return date.toLocaleDateString();
+}
+
+export function getDaysLeft(dateString: string) {
+  if (!dateString) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const maturity = new Date(`${dateString}T00:00:00`);
+  return Math.round((maturity.getTime() - today.getTime()) / (1000 * 3600 * 24));
+}

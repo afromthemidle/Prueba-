@@ -55,6 +55,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
                   - type: 'Fixed' or 'Variable'
                   - sector: 'Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', or 'Others'
                   - amount: number (the balance, value, or amount invested. If not found, omit or use 0)
+                  - maturityDate: string (YYYY-MM-DD format. If not found, omit)
                   `
                 }
               ]
@@ -72,7 +73,8 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
                     country: { type: Type.STRING },
                     type: { type: Type.STRING },
                     sector: { type: Type.STRING },
-                    amount: { type: Type.NUMBER }
+                    amount: { type: Type.NUMBER },
+                    maturityDate: { type: Type.STRING }
                   },
                   required: ["name", "rate", "currency", "country", "type", "sector"]
                 }

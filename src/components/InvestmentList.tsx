@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
-import { formatPercent } from '../lib/utils';
+import { formatPercent, formatDate } from '../lib/utils';
 import { Search, Plus, Upload, Edit2, Trash2, Filter } from 'lucide-react';
 import { InvestmentModal } from './InvestmentModal';
 import { AIUploadModal } from './AIUploadModal';
@@ -180,7 +180,7 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                       <>
                         <span className="text-xs text-slate-300">•</span>
                         <span className="text-xs font-medium text-slate-500">
-                          {t("Maturity")}: {new Date(inv.maturityDate).toLocaleDateString()}
+                          {t("Maturity")}: {formatDate(inv.maturityDate)}
                         </span>
                       </>
                     )}

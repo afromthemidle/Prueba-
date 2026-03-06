@@ -42,7 +42,8 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
       currency: (formData.currency as 'USD' | 'EUR') || 'USD',
       country: formData.country || 'Global',
       type: (formData.type as InvestmentType) || 'Fixed',
-      sector: (formData.sector as InvestmentSector) || 'Others'
+      sector: (formData.sector as InvestmentSector) || 'Others',
+      maturityDate: formData.maturityDate || undefined
     });
     onClose();
   };

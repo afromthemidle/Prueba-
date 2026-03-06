@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
-import { formatCurrency, formatPercent } from '../lib/utils';
+import { formatCurrency, formatPercent, formatDate, getDaysLeft } from '../lib/utils';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -82,8 +82,8 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
 
     const upcomingMaturities = [...activeInvestments]
       .filter(inv => inv.maturityDate)
-      .sort((a, b) => new Date(a.maturityDate!).getTime() - new Date(b.maturityDate!).getTime())
-      .filter(inv => new Date(inv.maturityDate!).getTime() >= new Date().setHours(0,0,0,0))
+      .sort((a, b) => new Date(`${a.maturityDate}T00:00:00`).getTime() - new Date(`${b.maturityDate}T00:00:00`).getTime())
+      .filter(inv => getDaysLeft(inv.maturityDate!) >= 0)
       .slice(0, 5);
 
     return {
@@ -340,7 +340,7 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
           <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Upcoming Maturities")}</h3>
           <div className="space-y-3">
             {stats.upcomingMaturities.length > 0 ? stats.upcomingMaturities.map((inv, idx) => {
-              const daysLeft = Math.ceil((new Date(inv.maturityDate!).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+              const daysLeft = getDaysLeft(inv.maturityDate!);
               const isUrgent = daysLeft <= 7;
               return (
                 <div key={inv.id} className={`flex items-center justify-between p-3 rounded-lg border ${isUrgent ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-100'}`}>
@@ -350,7 +350,7 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
                     </div>
                     <div>
                       <p className="font-medium text-sm text-slate-900">{inv.name}</p>
-                      <p className="text-[10px] uppercase text-slate-500">{new Date(inv.maturityDate!).toLocaleDateString()}</p>
+                      <p className="text-[10px] uppercase text-slate-500">{formatDate(inv.maturityDate!)}</p>
                     </div>
                   </div>
                   <div className="text-right">
