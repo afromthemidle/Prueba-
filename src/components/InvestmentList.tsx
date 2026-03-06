@@ -176,31 +176,31 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                     <span className="text-xs font-medium text-slate-500">
                       {t(inv.type)}
                     </span>
-                    <span className="text-xs text-slate-300">•</span>
-                    <span className={`text-xs font-semibold ${inv.rate >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {formatPercent(inv.rate)}
-                    </span>
+                    {inv.maturityDate && (
+                      <>
+                        <span className="text-xs text-slate-300">•</span>
+                        <span className="text-xs font-medium text-slate-500">
+                          {t("Maturity")}: {new Date(inv.maturityDate).toLocaleDateString()}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4 lg:w-auto mt-2 lg:mt-0">
-              {/* Maturity Date */}
-              <div className="flex flex-col gap-1 w-full sm:w-32">
-                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{t("Maturity Date")}</label>
-                <input 
-                  type="date"
-                  className="w-full px-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:border-slate-400 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-white transition-colors"
-                  value={inv.maturityDate || ''}
-                  onChange={(e) => onUpdate(inv.id, { maturityDate: e.target.value })}
-                />
-              </div>
+              <div className="flex items-center gap-4 sm:gap-6">
+                {/* Interest Rate Block */}
+                <div className="text-right">
+                  <div className={`font-mono text-sm font-semibold ${inv.rate >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {formatPercent(inv.rate)}
+                  </div>
+                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{t("Annual Rate")}</div>
+                </div>
 
-              {/* Amount */}
-              <div className="flex flex-col gap-1 w-full sm:w-36">
-                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{t("Amount")} ({inv.currency})</label>
-                <div className="relative">
+                {/* Amount */}
+                <div className="relative w-32">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">
                     {inv.currency === 'USD' ? '$' : '€'}
                   </span>
@@ -214,13 +214,13 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                     onChange={(e) => onAmountChange(inv.id, parseFloat(e.target.value) || 0)}
                   />
                 </div>
-              </div>
 
-              {/* Value in USD */}
-              <div className="flex flex-col gap-1 w-full sm:w-28 text-right justify-center">
-                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{t("Value (USD)")}</label>
-                <div className="py-1.5 font-mono text-sm font-semibold text-slate-900">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format((amounts[inv.id] || 0) * (inv.currency === 'EUR' ? 1.08 : 1))}
+                {/* Value in USD */}
+                <div className="w-24 text-right">
+                  <div className="font-mono text-sm font-semibold text-slate-900">
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format((amounts[inv.id] || 0) * (inv.currency === 'EUR' ? 1.08 : 1))}
+                  </div>
+                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{t("USD Value")}</div>
                 </div>
               </div>
             </div>

@@ -113,10 +113,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#F4F4F5] text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Toaster position="top-right" />
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
@@ -140,62 +140,62 @@ export default function App() {
               </button>
             </div>
           </div>
+          
+          {/* Navigation Tabs (Moved into sticky header) */}
+          <div className="flex space-x-6 pt-2">
+            <button
+              onClick={() => setActiveTab('portfolio')}
+              className={`pb-3 text-sm font-medium transition-colors relative ${
+                activeTab === 'portfolio' 
+                  ? 'text-slate-900' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Wallet className="w-4 h-4" />
+                {t("Portfolio")}
+              </div>
+              {activeTab === 'portfolio' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('insights')}
+              className={`pb-3 text-sm font-medium transition-colors relative ${
+                activeTab === 'insights' 
+                  ? 'text-slate-900' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                {t("Insights")}
+              </div>
+              {activeTab === 'insights' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('suggestions')}
+              className={`pb-3 text-sm font-medium transition-colors relative ${
+                activeTab === 'suggestions' 
+                  ? 'text-slate-900' 
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                {t("Investment Ideas")}
+              </div>
+              {activeTab === 'suggestions' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
-        <div className="flex space-x-6 border-b border-slate-200 mb-8">
-          <button
-            onClick={() => setActiveTab('portfolio')}
-            className={`pb-4 text-sm font-medium transition-colors relative ${
-              activeTab === 'portfolio' 
-                ? 'text-slate-900' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Wallet className="w-4 h-4" />
-              {t("Portfolio")}
-            </div>
-            {activeTab === 'portfolio' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('insights')}
-            className={`pb-4 text-sm font-medium transition-colors relative ${
-              activeTab === 'insights' 
-                ? 'text-slate-900' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              {t("Insights")}
-            </div>
-            {activeTab === 'insights' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('suggestions')}
-            className={`pb-4 text-sm font-medium transition-colors relative ${
-              activeTab === 'suggestions' 
-                ? 'text-slate-900' 
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              {t("Investment Ideas")}
-            </div>
-            {activeTab === 'suggestions' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
-            )}
-          </button>
-        </div>
-
         {/* Content Area */}
         <div className="h-[calc(100vh-12rem)] min-h-[600px]">
           {activeTab === 'portfolio' && (

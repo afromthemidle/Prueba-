@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import { Investment } from '../data/investments';
+import React, { useMemo, useState } from 'react';
+import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
 import { formatCurrency, formatPercent } from '../lib/utils';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { useLanguage } from '../i18n/LanguageContext';
+import { Filter } from 'lucide-react';
 
 interface DashboardStatsProps {
   investments: Investment[];
@@ -18,6 +19,10 @@ const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
 
 export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
   const { t } = useLanguage();
+  const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
+  const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
+  const [filterCurrency, setFilterCurrency] = useState<'USD' | 'EUR' | 'All'>('All');
+
   const stats = useMemo(() => {
     let totalUSD = 0;
     const byCountry: Record<string, number> = {};
@@ -31,7 +36,14 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
     // For top paying investments
     const activeInvestments = [];
 
-    investments.forEach(inv => {
+    const filteredInvestments = investments.filter(inv => {
+      const matchesSector = filterSector === 'All' || inv.sector === filterSector;
+      const matchesType = filterType === 'All' || inv.type === filterType;
+      const matchesCurrency = filterCurrency === 'All' || inv.currency === filterCurrency;
+      return matchesSector && matchesType && matchesCurrency;
+    });
+
+    filteredInvestments.forEach(inv => {
       const amount = amounts[inv.id] || 0;
       if (amount <= 0) return;
 
@@ -85,9 +97,11 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
       topByAmount,
       upcomingMaturities
     };
-  }, [investments, amounts]);
+  }, [investments, amounts, filterSector, filterType, filterCurrency]);
 
-  if (stats.totalUSD === 0) {
+  const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
+
+  if (stats.totalUSD === 0 && investments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[400px] bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
         <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-4">
@@ -115,6 +129,51 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Filters */}
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Filter className="w-4 h-4 text-slate-400" />
+          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">{t("Filter Statistics")}</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Investment Type")}</label>
+            <select
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white focus:outline-none focus:border-slate-400 transition-colors text-sm"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as InvestmentType | 'All')}
+            >
+              <option value="All">{t("All Types")}</option>
+              <option value="Fixed">{t("Fixed Income")}</option>
+              <option value="Variable">{t("Variable Income")}</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Sector")}</label>
+            <select
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white focus:outline-none focus:border-slate-400 transition-colors text-sm"
+              value={filterSector}
+              onChange={(e) => setFilterSector(e.target.value as InvestmentSector | 'All')}
+            >
+              <option value="All">{t("All Sectors")}</option>
+              {sectors.map(s => <option key={s} value={s}>{t(s)}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency")}</label>
+            <select
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white focus:outline-none focus:border-slate-400 transition-colors text-sm"
+              value={filterCurrency}
+              onChange={(e) => setFilterCurrency(e.target.value as 'USD' | 'EUR' | 'All')}
+            >
+              <option value="All">{t("All Currencies")}</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">

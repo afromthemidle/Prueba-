@@ -84,7 +84,12 @@ export const translations: Translations = {
   "matures in": { en: "matures in", es: "vence en" },
   "days": { en: "days", es: "días" },
   "No Investments Yet": { en: "No Investments Yet", es: "Aún no hay inversiones" },
-  "Enter amounts in the Portfolio tab to see your wealth distribution, average interest rates, and detailed statistics.": { en: "Enter amounts in the Portfolio tab to see your wealth distribution, average interest rates, and detailed statistics.", es: "Ingresa montos en la pestaña Portafolio para ver la distribución de tu riqueza, tasas de interés promedio y estadísticas detalladas." }
+  "Enter amounts in the Portfolio tab to see your wealth distribution, average interest rates, and detailed statistics.": { en: "Enter amounts in the Portfolio tab to see your wealth distribution, average interest rates, and detailed statistics.", es: "Ingresa montos en la pestaña Portafolio para ver la distribución de tu riqueza, tasas de interés promedio y estadísticas detalladas." },
+  "Maturity": { en: "Maturity", es: "Vencimiento" },
+  "Annual Rate": { en: "Annual Rate", es: "Tasa Anual" },
+  "Filter Statistics": { en: "Filter Statistics", es: "Filtrar Estadísticas" },
+  "All Currencies": { en: "All Currencies", es: "Todas las Divisas" },
+  "USD Value": { en: "USD Value", es: "Valor USD" }
 };
 
 interface LanguageContextType {
