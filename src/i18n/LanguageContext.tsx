@@ -89,7 +89,29 @@ export const translations: Translations = {
   "Annual Rate": { en: "Annual Rate", es: "Tasa Anual" },
   "Filter Statistics": { en: "Filter Statistics", es: "Filtrar Estadísticas" },
   "All Currencies": { en: "All Currencies", es: "Todas las Divisas" },
-  "USD Value": { en: "USD Value", es: "Valor USD" }
+  "USD Value": { en: "USD Value", es: "Valor USD" },
+  "Sign In": { en: "Sign In", es: "Iniciar Sesión" },
+  "Sign Out": { en: "Sign Out", es: "Cerrar Sesión" },
+  "Create Account": { en: "Create Account", es: "Crear Cuenta" },
+  "Email": { en: "Email", es: "Correo Electrónico" },
+  "Password": { en: "Password", es: "Contraseña" },
+  "Forgot Password?": { en: "Forgot Password?", es: "¿Olvidaste tu contraseña?" },
+  "Reset Password": { en: "Reset Password", es: "Restablecer Contraseña" },
+  "Send Reset Link": { en: "Send Reset Link", es: "Enviar enlace de recuperación" },
+  "Don't have an account?": { en: "Don't have an account?", es: "¿No tienes una cuenta?" },
+  "Sign Up": { en: "Sign Up", es: "Regístrate" },
+  "Already have an account?": { en: "Already have an account?", es: "¿Ya tienes una cuenta?" },
+  "Please wait...": { en: "Please wait...", es: "Por favor espera..." },
+  "Logged in successfully": { en: "Logged in successfully", es: "Sesión iniciada con éxito" },
+  "Account created successfully": { en: "Account created successfully", es: "Cuenta creada con éxito" },
+  "Logged out successfully": { en: "Logged out successfully", es: "Sesión cerrada con éxito" },
+  "Password reset email sent": { en: "Password reset email sent", es: "Correo de recuperación enviado" },
+  "Data synced from cloud": { en: "Data synced from cloud", es: "Datos sincronizados de la nube" },
+  "Local data saved to cloud": { en: "Local data saved to cloud", es: "Datos locales guardados en la nube" },
+  "Cloud Sync Active": { en: "Cloud Sync Active", es: "Sincronización Activa" },
+  "Supabase Not Configured": { en: "Supabase Not Configured", es: "Supabase no configurado" },
+  "To enable user accounts and cloud sync, please set up Supabase and add the configuration to your environment variables.": { en: "To enable user accounts and cloud sync, please set up Supabase and add the configuration to your environment variables.", es: "Para habilitar cuentas de usuario y sincronización, configura Supabase y añade la configuración a tus variables de entorno." },
+  "Continue in Local Mode": { en: "Continue in Local Mode", es: "Continuar en Modo Local" }
 };
 
 interface LanguageContextType {

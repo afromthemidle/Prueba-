@@ -3,13 +3,19 @@ import { initialInvestments, Investment } from './data/investments';
 import { InvestmentList } from './components/InvestmentList';
 import { DashboardStats } from './components/DashboardStats';
 import { AISuggestions } from './components/AISuggestions';
-import { LayoutDashboard, Wallet, Sparkles, TrendingUp } from 'lucide-react';
+import { AuthModal } from './components/AuthModal';
+import { LayoutDashboard, Wallet, Sparkles, TrendingUp, User as UserIcon, LogOut } from 'lucide-react';
 import { useLanguage } from './i18n/LanguageContext';
 import toast, { Toaster } from 'react-hot-toast';
+import { useAuth } from './contexts/AuthContext';
+import { supabase, isSupabaseConfigured } from './lib/supabase';
 
 export default function App() {
   const { t, language, setLanguage } = useLanguage();
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'portfolio' | 'insights' | 'suggestions'>('portfolio');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   
   const [investments, setInvestments] = useState<Investment[]>(() => {
     const saved = localStorage.getItem('customInvestments_v2');
@@ -22,14 +28,58 @@ export default function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
+  // Sync with Cloud when user logs in
+  useEffect(() => {
+    async function loadCloudData() {
+      if (user && supabase) {
+        setIsSyncing(true);
+        try {
+          const { data, error } = await supabase
+            .from('user_data')
+            .select('investments, amounts')
+            .eq('user_id', user.id)
+            .single();
+
+          if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            throw error;
+          }
+
+          if (data) {
+            if (data.investments) setInvestments(data.investments);
+            if (data.amounts) setAmounts(data.amounts);
+            toast.success(t("Data synced from cloud"));
+          } else {
+            // First time login, save local data to cloud
+            const { error: insertError } = await supabase
+              .from('user_data')
+              .insert([{ user_id: user.id, investments, amounts }]);
+            if (insertError) throw insertError;
+            toast.success(t("Local data saved to cloud"));
+          }
+        } catch (error) {
+          console.error("Error loading cloud data:", error);
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+    }
+    loadCloudData();
+  }, [user, t]);
+
+  // Save to localStorage and Cloud when data changes
   useEffect(() => {
     localStorage.setItem('customInvestments_v2', JSON.stringify(investments));
-  }, [investments]);
-
-  // Save to localStorage when amounts change
-  useEffect(() => {
     localStorage.setItem('investmentAmounts_v2', JSON.stringify(amounts));
-  }, [amounts]);
+
+    if (user && supabase && !isSyncing) {
+      supabase
+        .from('user_data')
+        .upsert({ user_id: user.id, investments, amounts }, { onConflict: 'user_id' })
+        .then(({ error }) => {
+          if (error) console.error("Error saving to cloud:", error);
+        });
+    }
+  }, [investments, amounts, user, isSyncing]);
 
   // Notifications for upcoming maturities
   useEffect(() => {
@@ -126,6 +176,30 @@ export default function App() {
               <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
             </div>
             <div className="flex items-center gap-2">
+              {user ? (
+                <div className="flex items-center gap-3 mr-4">
+                  <div className="flex flex-col items-end">
+                    <span className="text-xs font-medium text-slate-900">{user.email}</span>
+                    <span className="text-[10px] text-emerald-600 font-medium">{t("Cloud Sync Active")}</span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+                    title={t("Sign Out")}
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 mr-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium transition-colors"
+                >
+                  <UserIcon className="w-3.5 h-3.5" />
+                  {t("Sign In")}
+                </button>
+              )}
+              <div className="h-4 w-px bg-slate-200 mx-1"></div>
               <button
                 onClick={() => setLanguage('en')}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
@@ -228,6 +302,11 @@ export default function App() {
           )}
         </div>
       </main>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
     </div>
   );
 }
