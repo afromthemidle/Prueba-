@@ -15,7 +15,7 @@ export default function App() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'portfolio' | 'insights' | 'suggestions'>('portfolio');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
   
   const [investments, setInvestments] = useState<Investment[]>(() => {
     const saved = localStorage.getItem('customInvestments_v2');
@@ -46,7 +46,8 @@ export default function App() {
   useEffect(() => {
     async function loadCloudData() {
       if (user && supabase) {
-        setIsSyncing(true);
+        if (loadedUserId === user.id) return;
+        
         try {
           const { data, error } = await supabase
             .from('user_data')
@@ -83,19 +84,21 @@ export default function App() {
         } catch (error) {
           console.error("Error loading cloud data:", error);
         } finally {
-          setIsSyncing(false);
+          setLoadedUserId(user.id);
         }
+      } else if (!user) {
+        setLoadedUserId(null);
       }
     }
     loadCloudData();
-  }, [user, t]);
+  }, [user, t, loadedUserId, setLanguage]);
 
   // Save to localStorage and Cloud when data changes
   useEffect(() => {
     localStorage.setItem('customInvestments_v2', JSON.stringify(investments));
     localStorage.setItem('investmentAmounts_v2', JSON.stringify(amounts));
 
-    if (user && supabase && !isSyncing) {
+    if (user && supabase && loadedUserId === user.id) {
       const currentSettings = {
         language: localStorage.getItem('app_language') || 'es',
         notified_investments: JSON.parse(localStorage.getItem('notified_investments') || '{}')
@@ -108,7 +111,7 @@ export default function App() {
           if (error) console.error("Error saving to cloud:", error);
         });
     }
-  }, [investments, amounts, language, user, isSyncing]);
+  }, [investments, amounts, language, user, loadedUserId]);
 
   // Notifications for upcoming maturities
   useEffect(() => {
