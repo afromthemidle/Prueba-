@@ -12,7 +12,7 @@ export interface Investment {
   id: string;
   name: string;
   rate: number;
-  currency: 'USD' | 'EUR';
+  currency: string;
   country: string;
   type: InvestmentType;
   sector: InvestmentSector;

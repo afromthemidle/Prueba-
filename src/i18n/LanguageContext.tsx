@@ -35,7 +35,7 @@ export const translations: Translations = {
   "Average Weighted Interest": { en: "Average Weighted Interest", es: "Interés Promedio Ponderado" },
   "Distribution by Sector": { en: "Distribution by Sector", es: "Distribución por Sector" },
   "Fixed vs Variable Income": { en: "Fixed vs Variable Income", es: "Renta Fija vs Variable" },
-  "Distribution by Currency": { en: "Distribution by Currency", es: "Distribución por Divisa" },
+  "Distribution by Currency / Asset": { en: "Distribution by Currency / Asset", es: "Distribución por Divisa / Activo" },
   "Distribution by Country": { en: "Distribution by Country", es: "Distribución por País" },
   "Largest Investments (by Amount)": { en: "Largest Investments (by Amount)", es: "Inversiones más grandes (por monto)" },
   "Highest Yielding Active Investments": { en: "Highest Yielding Active Investments", es: "Inversiones activas de mayor rendimiento" },
@@ -126,7 +126,17 @@ export const translations: Translations = {
   "Error saving portfolio state": { en: "Error saving portfolio state", es: "Error al guardar el estado del portafolio" },
   "Updated today": { en: "Updated today", es: "Actualizado hoy" },
   "Updated yesterday": { en: "Updated yesterday", es: "Actualizado ayer" },
-  "Updated {days} days ago": { en: "Updated {days} days ago", es: "Actualizado hace {days} días" }
+  "Updated {days} days ago": { en: "Updated {days} days ago", es: "Actualizado hace {days} días" },
+  "Currency / Asset": { en: "Currency / Asset", es: "Divisa / Activo" },
+  "Currencies": { en: "Currencies", es: "Divisas" },
+  "Cryptocurrencies": { en: "Cryptocurrencies", es: "Criptomonedas" },
+  "Other Assets": { en: "Other Assets", es: "Otros Activos" },
+  "Stocks": { en: "Stocks", es: "Acciones" },
+  "Fixed Income Funds": { en: "Fixed Income Funds", es: "Fondos de Renta Fija" },
+  "Other": { en: "Other", es: "Otro" },
+  "All Currencies / Assets": { en: "All Currencies / Assets", es: "Todas las Divisas / Activos" },
+  "Updated Before": { en: "Updated Before", es: "Actualizado Antes De" },
+  "Clear": { en: "Clear", es: "Limpiar" }
 };
 
 interface LanguageContextType {

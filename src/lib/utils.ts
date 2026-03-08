@@ -5,13 +5,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(value: number, currency: 'USD' | 'EUR' = 'USD') {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+export function formatCurrency(value: number, currency: string = 'USD') {
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  } catch (e) {
+    // Fallback for non-standard currencies like BTC, ETH, S&P 500, etc.
+    return `${value.toLocaleString('en-US', { maximumFractionDigits: 2 })} ${currency}`;
+  }
 }
 
 export function formatPercent(value: number) {

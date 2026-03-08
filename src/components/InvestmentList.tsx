@@ -21,6 +21,7 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
+  const [filterUpdatedBefore, setFilterUpdatedBefore] = useState<string>('');
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   
@@ -32,7 +33,21 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
     const matchesSearch = inv.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSector = filterSector === 'All' || inv.sector === filterSector;
     const matchesType = filterType === 'All' || inv.type === filterType;
-    return matchesSearch && matchesSector && matchesType;
+    
+    let matchesUpdateDate = true;
+    if (filterUpdatedBefore) {
+      if (!inv.updatedAt) {
+        matchesUpdateDate = false;
+      } else {
+        const invDate = new Date(inv.updatedAt);
+        invDate.setHours(0, 0, 0, 0);
+        const filterDate = new Date(filterUpdatedBefore);
+        filterDate.setHours(0, 0, 0, 0);
+        matchesUpdateDate = invDate < filterDate;
+      }
+    }
+    
+    return matchesSearch && matchesSector && matchesType && matchesUpdateDate;
   });
 
   const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
@@ -152,6 +167,26 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                   {sectors.map(s => <option key={s} value={s}>{t(s)}</option>)}
                 </select>
               </div>
+
+              <div className="w-full sm:w-48">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Updated Before")}</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                    value={filterUpdatedBefore}
+                    onChange={(e) => setFilterUpdatedBefore(e.target.value)}
+                  />
+                  {filterUpdatedBefore && (
+                    <button 
+                      onClick={() => setFilterUpdatedBefore('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                    >
+                      {t("Clear")}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -221,14 +256,14 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                 {/* Amount */}
                 <div className="relative w-32">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">
-                    {inv.currency === 'USD' ? '$' : '€'}
+                    {inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : inv.currency === 'GBP' ? '£' : inv.currency === 'JPY' ? '¥' : ''}
                   </span>
                   <input
                     type="number"
                     min="0"
-                    step="100"
+                    step="any"
                     placeholder="0"
-                    className="w-full pl-6 pr-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:border-slate-400 text-right font-mono text-sm font-medium bg-slate-50 hover:bg-white transition-colors"
+                    className={`w-full ${['USD', 'EUR', 'GBP', 'JPY'].includes(inv.currency) ? 'pl-6' : 'pl-2.5'} pr-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:border-slate-400 text-right font-mono text-sm font-medium bg-slate-50 hover:bg-white transition-colors`}
                     value={amounts[inv.id] || ''}
                     onChange={(e) => onAmountChange(inv.id, parseFloat(e.target.value) || 0)}
                   />
@@ -237,7 +272,9 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                 {/* Value in USD */}
                 <div className="w-24 text-right">
                   <div className="font-mono text-sm font-semibold text-slate-900">
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format((amounts[inv.id] || 0) * (inv.currency === 'EUR' ? 1.08 : 1))}
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
+                      (amounts[inv.id] || 0) * (inv.currency === 'EUR' ? 1.08 : inv.currency === 'GBP' ? 1.27 : inv.currency === 'JPY' ? 0.0067 : 1)
+                    )}
                   </div>
                   <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{t("USD Value")}</div>
                 </div>

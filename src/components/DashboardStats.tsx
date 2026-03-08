@@ -25,7 +25,7 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
   const { t } = useLanguage();
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
-  const [filterCurrency, setFilterCurrency] = useState<'USD' | 'EUR' | 'All'>('All');
+  const [filterCurrency, setFilterCurrency] = useState<string>('All');
 
   const stats = useMemo(() => {
     let totalUSD = 0;
@@ -51,7 +51,7 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
       const amount = amounts[inv.id] || 0;
       if (amount <= 0) return;
 
-      const amountUSD = inv.currency === 'EUR' ? amount * EUR_TO_USD : amount;
+      const amountUSD = amount * (inv.currency === 'EUR' ? 1.08 : inv.currency === 'GBP' ? 1.27 : inv.currency === 'JPY' ? 0.0067 : 1);
       totalUSD += amountUSD;
 
       byCountry[inv.country] = (byCountry[inv.country] || 0) + amountUSD;
@@ -208,15 +208,16 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency")}</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency / Asset")}</label>
             <select
               className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white focus:outline-none focus:border-slate-400 transition-colors text-sm"
               value={filterCurrency}
-              onChange={(e) => setFilterCurrency(e.target.value as 'USD' | 'EUR' | 'All')}
+              onChange={(e) => setFilterCurrency(e.target.value)}
             >
-              <option value="All">{t("All Currencies")}</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
+              <option value="All">{t("All Currencies / Assets")}</option>
+              {Array.from(new Set(investments.map(inv => inv.currency))).map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -379,7 +380,7 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
 
         {/* Currency Distribution */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Currency")}</h3>
+          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Currency / Asset")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
