@@ -103,7 +103,7 @@ export const translations: Translations = {
   "Already have an account?": { en: "Already have an account?", es: "¿Ya tienes una cuenta?" },
   "Please wait...": { en: "Please wait...", es: "Por favor espera..." },
   "Logged in successfully": { en: "Logged in successfully", es: "Sesión iniciada con éxito" },
-  "Account created successfully": { en: "Account created successfully", es: "Cuenta creada con éxito" },
+  "Account created successfully. Please check your email to confirm.": { en: "Account created successfully. Please check your email to confirm.", es: "Cuenta creada con éxito. Por favor, revisa tu correo para confirmar." },
   "Logged out successfully": { en: "Logged out successfully", es: "Sesión cerrada con éxito" },
   "Password reset email sent": { en: "Password reset email sent", es: "Correo de recuperación enviado" },
   "Data synced from cloud": { en: "Data synced from cloud", es: "Datos sincronizados de la nube" },

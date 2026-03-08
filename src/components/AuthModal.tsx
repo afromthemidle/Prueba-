@@ -54,9 +54,15 @@ export function AuthModal({ isOpen, onClose }: Props) {
         toast.success(t("Logged in successfully"));
         onClose();
       } else if (mode === 'register') {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: window.location.origin
+          }
+        });
         if (error) throw error;
-        toast.success(t("Account created successfully"));
+        toast.success(t("Account created successfully. Please check your email to confirm."));
         onClose();
       } else if (mode === 'forgot') {
         await resetPassword(email);

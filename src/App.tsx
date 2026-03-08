@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { initialInvestments, Investment } from './data/investments';
 import { InvestmentList } from './components/InvestmentList';
 import { DashboardStats } from './components/DashboardStats';
@@ -28,6 +28,20 @@ export default function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
+  const previousUserRef = useRef(user);
+
+  // Clear data on logout to prevent data leaks
+  useEffect(() => {
+    if (previousUserRef.current && !user) {
+      setInvestments(initialInvestments);
+      setAmounts({});
+      localStorage.removeItem('customInvestments_v2');
+      localStorage.removeItem('investmentAmounts_v2');
+      localStorage.removeItem('notified_investments');
+    }
+    previousUserRef.current = user;
+  }, [user]);
+
   // Sync with Cloud when user logs in
   useEffect(() => {
     async function loadCloudData() {
@@ -36,7 +50,7 @@ export default function App() {
         try {
           const { data, error } = await supabase
             .from('user_data')
-            .select('investments, amounts')
+            .select('investments, amounts, settings')
             .eq('user_id', user.id)
             .single();
 
@@ -47,12 +61,22 @@ export default function App() {
           if (data) {
             if (data.investments) setInvestments(data.investments);
             if (data.amounts) setAmounts(data.amounts);
+            if (data.settings) {
+              if (data.settings.language) setLanguage(data.settings.language);
+              if (data.settings.notified_investments) {
+                localStorage.setItem('notified_investments', JSON.stringify(data.settings.notified_investments));
+              }
+            }
             toast.success(t("Data synced from cloud"));
           } else {
             // First time login, save local data to cloud
+            const currentSettings = {
+              language: localStorage.getItem('app_language') || 'es',
+              notified_investments: JSON.parse(localStorage.getItem('notified_investments') || '{}')
+            };
             const { error: insertError } = await supabase
               .from('user_data')
-              .insert([{ user_id: user.id, investments, amounts }]);
+              .insert([{ user_id: user.id, investments, amounts, settings: currentSettings }]);
             if (insertError) throw insertError;
             toast.success(t("Local data saved to cloud"));
           }
@@ -72,14 +96,19 @@ export default function App() {
     localStorage.setItem('investmentAmounts_v2', JSON.stringify(amounts));
 
     if (user && supabase && !isSyncing) {
+      const currentSettings = {
+        language: localStorage.getItem('app_language') || 'es',
+        notified_investments: JSON.parse(localStorage.getItem('notified_investments') || '{}')
+      };
+
       supabase
         .from('user_data')
-        .upsert({ user_id: user.id, investments, amounts }, { onConflict: 'user_id' })
+        .upsert({ user_id: user.id, investments, amounts, settings: currentSettings }, { onConflict: 'user_id' })
         .then(({ error }) => {
           if (error) console.error("Error saving to cloud:", error);
         });
     }
-  }, [investments, amounts, user, isSyncing]);
+  }, [investments, amounts, language, user, isSyncing]);
 
   // Notifications for upcoming maturities
   useEffect(() => {
