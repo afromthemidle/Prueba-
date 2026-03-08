@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
 import { formatPercent, formatDate } from '../lib/utils';
-import { Search, Plus, Upload, Edit2, Trash2, Filter } from 'lucide-react';
+import { Search, Plus, Upload, Edit2, Trash2, Filter, Clock } from 'lucide-react';
 import { InvestmentModal } from './InvestmentModal';
 import { AIUploadModal } from './AIUploadModal';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -48,6 +48,19 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
     } else {
       onAdd(inv);
     }
+  };
+
+  const getUpdateText = (updatedAt?: string) => {
+    if (!updatedAt) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const updatedDate = new Date(updatedAt);
+    updatedDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((today.getTime() - updatedDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return t("Updated today");
+    if (diffDays === 1) return t("Updated yesterday");
+    return t("Updated {days} days ago").replace('{days}', diffDays.toString());
   };
 
   return (
@@ -185,6 +198,12 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                       </>
                     )}
                   </div>
+                  {inv.updatedAt && (
+                    <div className="flex items-center gap-1 mt-1.5 text-[10px] text-slate-400">
+                      <Clock className="w-3 h-3" />
+                      <span>{getUpdateText(inv.updatedAt)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

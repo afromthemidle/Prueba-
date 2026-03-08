@@ -160,14 +160,20 @@ export default function App() {
       ...prev,
       [id]: amount
     }));
+    setInvestments(prev => prev.map(inv => 
+      inv.id === id ? { ...inv, updatedAt: new Date().toISOString() } : inv
+    ));
   };
 
   const handleAddInvestment = (inv: Investment) => {
-    setInvestments(prev => [inv, ...prev]);
+    const newInv = { ...inv, updatedAt: new Date().toISOString() };
+    setInvestments(prev => [newInv, ...prev]);
   };
 
   const handleUpdateInvestment = (id: string, updated: Partial<Investment>) => {
-    setInvestments(prev => prev.map(inv => inv.id === id ? { ...inv, ...updated } : inv));
+    setInvestments(prev => prev.map(inv => 
+      inv.id === id ? { ...inv, ...updated, updatedAt: new Date().toISOString() } : inv
+    ));
   };
 
   const handleDeleteInvestment = (id: string) => {
@@ -180,7 +186,10 @@ export default function App() {
   };
 
   const handleAddMultiple = (newInvs: (Investment & { amount?: number })[], type: 'partial' | 'total') => {
-    const cleanInvs = newInvs.map(({ amount, ...inv }) => inv);
+    const cleanInvs = newInvs.map(({ amount, ...inv }) => ({
+      ...inv,
+      updatedAt: new Date().toISOString()
+    }));
     
     if (type === 'total') {
       setInvestments(cleanInvs);

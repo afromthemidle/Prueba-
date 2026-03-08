@@ -17,6 +17,7 @@ export interface Investment {
   type: InvestmentType;
   sector: InvestmentSector;
   maturityDate?: string;
+  updatedAt?: string;
 }
 
 export interface PortfolioSnapshot {

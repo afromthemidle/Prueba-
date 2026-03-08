@@ -123,7 +123,10 @@ export const translations: Translations = {
   "Growth Percentage": { en: "Growth Percentage", es: "Porcentaje de Crecimiento" },
   "Growth": { en: "Growth", es: "Crecimiento" },
   "Portfolio state saved successfully": { en: "Portfolio state saved successfully", es: "Estado del portafolio guardado con éxito" },
-  "Error saving portfolio state": { en: "Error saving portfolio state", es: "Error al guardar el estado del portafolio" }
+  "Error saving portfolio state": { en: "Error saving portfolio state", es: "Error al guardar el estado del portafolio" },
+  "Updated today": { en: "Updated today", es: "Actualizado hoy" },
+  "Updated yesterday": { en: "Updated yesterday", es: "Actualizado ayer" },
+  "Updated {days} days ago": { en: "Updated {days} days ago", es: "Actualizado hace {days} días" }
 };
 
 interface LanguageContextType {
