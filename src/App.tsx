@@ -9,6 +9,7 @@ import { useLanguage } from './i18n/LanguageContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
+import { PortfolioSnapshot } from './data/investments';
 
 export default function App() {
   const { t, language, setLanguage } = useLanguage();
@@ -16,6 +17,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'portfolio' | 'insights' | 'suggestions'>('portfolio');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
+  const [isSavingSnapshot, setIsSavingSnapshot] = useState(false);
   
   const [investments, setInvestments] = useState<Investment[]>(() => {
     const saved = localStorage.getItem('customInvestments_v2');
@@ -28,6 +30,11 @@ export default function App() {
     return saved ? JSON.parse(saved) : {};
   });
 
+  const [snapshots, setSnapshots] = useState<PortfolioSnapshot[]>(() => {
+    const saved = localStorage.getItem('portfolioSnapshots_v2');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const previousUserRef = useRef(user);
 
   // Clear data on logout to prevent data leaks
@@ -35,8 +42,10 @@ export default function App() {
     if (previousUserRef.current && !user) {
       setInvestments(initialInvestments);
       setAmounts({});
+      setSnapshots([]);
       localStorage.removeItem('customInvestments_v2');
       localStorage.removeItem('investmentAmounts_v2');
+      localStorage.removeItem('portfolioSnapshots_v2');
       localStorage.removeItem('notified_investments');
     }
     previousUserRef.current = user;
@@ -51,7 +60,7 @@ export default function App() {
         try {
           const { data, error } = await supabase
             .from('user_data')
-            .select('investments, amounts, settings')
+            .select('investments, amounts, settings, snapshots')
             .eq('user_id', user.id)
             .single();
 
@@ -62,6 +71,7 @@ export default function App() {
           if (data) {
             if (data.investments) setInvestments(data.investments);
             if (data.amounts) setAmounts(data.amounts);
+            if (data.snapshots) setSnapshots(data.snapshots);
             if (data.settings) {
               if (data.settings.language) setLanguage(data.settings.language);
               if (data.settings.notified_investments) {
@@ -77,7 +87,7 @@ export default function App() {
             };
             const { error: insertError } = await supabase
               .from('user_data')
-              .insert([{ user_id: user.id, investments, amounts, settings: currentSettings }]);
+              .insert([{ user_id: user.id, investments, amounts, snapshots, settings: currentSettings }]);
             if (insertError) throw insertError;
             toast.success(t("Local data saved to cloud"));
           }
@@ -97,6 +107,7 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('customInvestments_v2', JSON.stringify(investments));
     localStorage.setItem('investmentAmounts_v2', JSON.stringify(amounts));
+    localStorage.setItem('portfolioSnapshots_v2', JSON.stringify(snapshots));
 
     if (user && supabase && loadedUserId === user.id) {
       const currentSettings = {
@@ -106,12 +117,12 @@ export default function App() {
 
       supabase
         .from('user_data')
-        .upsert({ user_id: user.id, investments, amounts, settings: currentSettings }, { onConflict: 'user_id' })
+        .upsert({ user_id: user.id, investments, amounts, snapshots, settings: currentSettings }, { onConflict: 'user_id' })
         .then(({ error }) => {
           if (error) console.error("Error saving to cloud:", error);
         });
     }
-  }, [investments, amounts, language, user, loadedUserId]);
+  }, [investments, amounts, snapshots, language, user, loadedUserId]);
 
   // Notifications for upcoming maturities
   useEffect(() => {
@@ -191,6 +202,32 @@ export default function App() {
         });
         return newAmounts;
       });
+    }
+  };
+
+  const handleSaveSnapshot = () => {
+    setIsSavingSnapshot(true);
+    try {
+      const totalNetWorth = investments.reduce((sum, inv) => {
+        const amount = amounts[inv.id] || 0;
+        return sum + amount;
+      }, 0);
+
+      const newSnapshot: PortfolioSnapshot = {
+        id: crypto.randomUUID(),
+        date: new Date().toISOString(),
+        totalNetWorth,
+        investments: [...investments],
+        amounts: { ...amounts }
+      };
+
+      setSnapshots(prev => [...prev, newSnapshot]);
+      toast.success(t("Portfolio state saved successfully"));
+    } catch (error) {
+      console.error("Error saving snapshot:", error);
+      toast.error(t("Error saving portfolio state"));
+    } finally {
+      setIsSavingSnapshot(false);
     }
   };
 
@@ -323,6 +360,9 @@ export default function App() {
               <DashboardStats 
                 investments={investments} 
                 amounts={amounts} 
+                snapshots={snapshots}
+                onSaveSnapshot={handleSaveSnapshot}
+                isSaving={isSavingSnapshot}
               />
             </div>
           )}

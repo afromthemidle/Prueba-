@@ -1,23 +1,27 @@
 import React, { useMemo, useState } from 'react';
-import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
+import { Investment, InvestmentSector, InvestmentType, PortfolioSnapshot } from '../data/investments';
 import { formatCurrency, formatPercent, formatDate, getDaysLeft } from '../lib/utils';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, LineChart, Line
 } from 'recharts';
 import { useLanguage } from '../i18n/LanguageContext';
-import { Filter } from 'lucide-react';
+import { Filter, Save, History, TrendingUp } from 'lucide-react';
 
 interface DashboardStatsProps {
   investments: Investment[];
   amounts: Record<string, number>;
+  snapshots: PortfolioSnapshot[];
+  onSaveSnapshot: () => void;
+  isSaving: boolean;
 }
 
 const EUR_TO_USD = 1.08; // Approximate conversion rate for total net worth
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
 
-export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
+export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot, isSaving }: DashboardStatsProps) {
   const { t } = useLanguage();
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
@@ -99,6 +103,29 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
     };
   }, [investments, amounts, filterSector, filterType, filterCurrency]);
 
+  const historyChartData = useMemo(() => {
+    if (!snapshots || snapshots.length === 0) return [];
+    
+    // Sort by date ascending
+    const sorted = [...snapshots].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    const firstValue = sorted[0].totalNetWorth;
+
+    return sorted.map(snap => {
+      const dateObj = new Date(snap.date);
+      const growthMoney = snap.totalNetWorth - firstValue;
+      const growthPercentage = firstValue > 0 ? ((snap.totalNetWorth - firstValue) / firstValue) * 100 : 0;
+      
+      return {
+        date: dateObj.toLocaleDateString(),
+        fullDate: snap.date,
+        total: snap.totalNetWorth,
+        growthMoney,
+        growthPercentage: parseFloat(growthPercentage.toFixed(2))
+      };
+    });
+  }, [snapshots]);
+
   const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
 
   if (stats.totalUSD === 0 && investments.length === 0) {
@@ -129,6 +156,27 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Save State Action */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-5 rounded-xl shadow-sm border border-slate-200 gap-4">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <History className="w-4 h-4 text-indigo-600" />
+            {t("Portfolio History")}
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            {t("Save your current portfolio state to track your wealth growth over time.")}
+          </p>
+        </div>
+        <button
+          onClick={onSaveSnapshot}
+          disabled={isSaving}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-70 text-sm whitespace-nowrap"
+        >
+          <Save className="w-4 h-4" />
+          {isSaving ? t("Saving...") : t("Save Current State")}
+        </button>
+      </div>
+
       {/* Filters */}
       <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -187,6 +235,93 @@ export function DashboardStats({ investments, amounts }: DashboardStatsProps) {
           </p>
         </div>
       </div>
+
+      {/* Historical Charts */}
+      {historyChartData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Net Worth Chart */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Total Net Worth History")}</h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    width={60}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [formatCurrency(value), t("Total Net Worth")]}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="#4f46e5" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorTotal)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Growth Percentage Chart */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Growth Percentage")}</h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    tickFormatter={(value) => `${value}%`}
+                    width={40}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value}%`, t("Growth")]}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="growthPercentage" 
+                    stroke="#10b981" 
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: '#10b981', strokeWidth: 0 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

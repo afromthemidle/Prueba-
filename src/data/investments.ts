@@ -19,4 +19,12 @@ export interface Investment {
   maturityDate?: string;
 }
 
+export interface PortfolioSnapshot {
+  id: string;
+  date: string;
+  totalNetWorth: number;
+  investments: Investment[];
+  amounts: Record<string, number>;
+}
+
 export const initialInvestments: Investment[] = [];

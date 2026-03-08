@@ -111,7 +111,19 @@ export const translations: Translations = {
   "Cloud Sync Active": { en: "Cloud Sync Active", es: "Sincronización Activa" },
   "Supabase Not Configured": { en: "Supabase Not Configured", es: "Supabase no configurado" },
   "To enable user accounts and cloud sync, please set up Supabase and add the configuration to your environment variables.": { en: "To enable user accounts and cloud sync, please set up Supabase and add the configuration to your environment variables.", es: "Para habilitar cuentas de usuario y sincronización, configura Supabase y añade la configuración a tus variables de entorno." },
-  "Continue in Local Mode": { en: "Continue in Local Mode", es: "Continuar en Modo Local" }
+  "Continue in Local Mode": { en: "Continue in Local Mode", es: "Continuar en Modo Local" },
+  "History": { en: "History", es: "Historial" },
+  "Portfolio History": { en: "Portfolio History", es: "Historial del Portafolio" },
+  "Save your current portfolio state to track your wealth growth over time.": { en: "Save your current portfolio state to track your wealth growth over time.", es: "Guarda el estado actual de tu portafolio para rastrear el crecimiento de tu patrimonio a lo largo del tiempo." },
+  "Save Current State": { en: "Save Current State", es: "Guardar Estado Actual" },
+  "Saving...": { en: "Saving...", es: "Guardando..." },
+  "No historical data yet": { en: "No historical data yet", es: "Aún no hay datos históricos" },
+  "Click the button above to save your first portfolio snapshot and start tracking your wealth growth.": { en: "Click the button above to save your first portfolio snapshot and start tracking your wealth growth.", es: "Haz clic en el botón de arriba para guardar tu primer estado y empezar a rastrear el crecimiento de tu patrimonio." },
+  "Total Net Worth History": { en: "Total Net Worth History", es: "Historial del Patrimonio Neto" },
+  "Growth Percentage": { en: "Growth Percentage", es: "Porcentaje de Crecimiento" },
+  "Growth": { en: "Growth", es: "Crecimiento" },
+  "Portfolio state saved successfully": { en: "Portfolio state saved successfully", es: "Estado del portafolio guardado con éxito" },
+  "Error saving portfolio state": { en: "Error saving portfolio state", es: "Error al guardar el estado del portafolio" }
 };
 
 interface LanguageContextType {
