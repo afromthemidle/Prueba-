@@ -96,7 +96,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
           <div className="relative flex-1 sm:flex-none">
             <button 
               onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium transition-colors text-sm shadow-sm shadow-slate-900/10"
             >
               <Plus className="w-4 h-4" /> {t("Add")}
             </button>
@@ -128,7 +128,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
           </div>
           <button 
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors text-sm ${isFiltersOpen ? 'bg-slate-100 border-slate-300 text-slate-900' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'}`}
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 border rounded-xl font-medium transition-colors text-sm ${isFiltersOpen ? 'bg-slate-100/80 border-slate-300/80 text-slate-900' : 'bg-white border-slate-200/80 hover:bg-slate-50 text-slate-700 shadow-sm'}`}
           >
             <Filter className="w-4 h-4" /> {t("Filters")}
           </button>
@@ -136,7 +136,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
       </div>
 
       {isFiltersOpen && (
-        <div className="p-5 bg-white rounded-2xl shadow-sm border border-slate-200 space-y-4 mb-6 animate-in fade-in slide-in-from-top-2">
+        <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-200/60 space-y-4 mb-6 animate-in fade-in slide-in-from-top-2">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Search")}</label>
@@ -204,10 +204,10 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
 
       <div className="flex-1 overflow-y-auto space-y-3 pb-8 px-1">
         {filteredInvestments.map((inv) => (
-          <div key={inv.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-slate-300 transition-all duration-200 gap-4 group">
+          <div key={inv.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-5 rounded-2xl bg-white border border-slate-200/60 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all duration-300 gap-4 group">
             <div className="flex-1">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-slate-700 font-semibold text-lg border border-slate-100">
+                <div className="w-12 h-12 rounded-xl bg-slate-50/80 flex items-center justify-center text-slate-700 font-medium text-lg border border-slate-100/80">
                   {inv.name.charAt(0)}
                 </div>
                 <div>
@@ -264,13 +264,13 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
                 </div>
 
                 {/* Amount */}
-                <div className="flex items-center rounded-md border border-slate-200 bg-slate-50 focus-within:border-slate-400 focus-within:bg-white transition-colors overflow-hidden w-36">
+                <div className="flex items-center rounded-xl border border-slate-200/80 bg-slate-50/50 focus-within:border-slate-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-slate-50 transition-all overflow-hidden w-36">
                   <input
                     type="number"
                     min="0"
                     step="any"
                     placeholder="0"
-                    className="w-full pl-3 pr-2 py-1.5 bg-transparent focus:outline-none text-right font-mono text-sm font-medium"
+                    className="w-full pl-3 pr-2 py-2 bg-transparent focus:outline-none text-right font-mono text-sm font-medium"
                     value={amounts[inv.id] || ''}
                     onChange={(e) => onAmountChange(inv.id, parseFloat(e.target.value) || 0)}
                   />

@@ -155,7 +155,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
   return (
     <div className="space-y-6 pb-20">
       {/* Save State Action */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-5 rounded-xl shadow-sm border border-slate-200 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 gap-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <History className="w-4 h-4 text-indigo-600" />
@@ -168,7 +168,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         <button
           onClick={onSaveSnapshot}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors disabled:opacity-70 text-sm whitespace-nowrap"
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors disabled:opacity-70 text-sm whitespace-nowrap shadow-sm shadow-indigo-600/20"
         >
           <Save className="w-4 h-4" />
           {isSaving ? t("Saving...") : t("Save Current State")}
@@ -176,7 +176,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-4 h-4 text-slate-400" />
           <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">{t("Filter Statistics")}</h3>
@@ -222,12 +222,12 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       </div>
 
       {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/60">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Total Net Worth")}</p>
           <p className="text-4xl font-light text-slate-900 tracking-tight font-mono">{formatCurrency(stats.totalUSD)}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/60">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Average Weighted Interest")}</p>
           <p className={`text-4xl font-light tracking-tight font-mono ${stats.avgInterest >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
             {formatPercent(stats.avgInterest)}
@@ -239,7 +239,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       {historyChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Net Worth Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
             <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Total Net Worth History")}</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -283,7 +283,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
           </div>
 
           {/* Growth Percentage Chart */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
             <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Growth Percentage")}</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -325,7 +325,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sector Distribution */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Sector")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -351,7 +351,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         </div>
 
         {/* Type Distribution */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Fixed vs Variable Income")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -377,7 +377,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         </div>
 
         {/* Currency Distribution */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Currency / Asset")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -403,7 +403,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         </div>
 
         {/* Country Distribution */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Country")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -422,7 +422,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       {/* Top Investments Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Largest Investments */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Largest Investments (by Amount)")}</h3>
           <div className="space-y-3">
             {stats.topByAmount.map((inv, idx) => (
@@ -446,7 +446,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         </div>
 
         {/* Top Paying Investments */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Highest Yielding Active Investments")}</h3>
           <div className="space-y-3">
             {stats.topPaying.map((inv, idx) => (
@@ -470,7 +470,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         </div>
 
         {/* Upcoming Maturities */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">{t("Upcoming Maturities")}</h3>
           <div className="space-y-3">
             {stats.upcomingMaturities.length > 0 ? stats.upcomingMaturities.map((inv, idx) => {

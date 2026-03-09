@@ -275,14 +275,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F4F5] text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Toaster position="top-right" />
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center shadow-md shadow-slate-900/10">
                 <TrendingUp className="w-4 h-4 text-white" />
               </div>
               <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
@@ -305,7 +305,7 @@ export default function App() {
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 mr-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 mr-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm shadow-slate-900/10"
                 >
                   <UserIcon className="w-3.5 h-3.5" />
                   {t("Sign In")}
@@ -314,13 +314,13 @@ export default function App() {
               <div className="h-4 w-px bg-slate-200 mx-1"></div>
               <button
                 onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <span>🇺🇸</span> EN
               </button>
               <button
                 onClick={() => setLanguage('es')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
               >
                 <span>🇪🇸</span> ES
               </button>
