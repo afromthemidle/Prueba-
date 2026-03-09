@@ -43,7 +43,7 @@ export default function App() {
   useEffect(() => {
     const fetchPrices = async () => {
       setIsLoadingPrices(true);
-      const uniqueAssets = Array.from(new Set(investments.map(inv => inv.currency)));
+      const uniqueAssets = Array.from(new Set(investments.map(inv => inv.currency))) as string[];
       const newPrices: Record<string, number> = { ...prices };
       
       let updated = false;

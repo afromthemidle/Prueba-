@@ -9,7 +9,7 @@ export const getYahooTicker = (asset: string): string => {
     'ADA': 'ADA-USD',
     'XRP': 'XRP-USD',
     'S&P 500': '^GSPC',
-    'MSCI World': 'URTH',
+    'MSCI WORLD': 'URTH',
     'NASDAQ': '^NDX',
     'GOLD': 'GC=F',
     'ORO': 'GC=F',

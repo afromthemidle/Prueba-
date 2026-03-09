@@ -129,7 +129,6 @@ export const translations: Translations = {
   "Updated {days} days ago": { en: "Updated {days} days ago", es: "Actualizado hace {days} días" },
   "Currency / Asset": { en: "Currency / Asset", es: "Divisa / Activo" },
   "Currencies": { en: "Currencies", es: "Divisas" },
-  "Cryptocurrencies": { en: "Cryptocurrencies", es: "Criptomonedas" },
   "Updating prices...": { en: "Updating prices...", es: "Actualizando precios..." },
   "Live Price": { en: "Live Price", es: "Precio en Vivo" },
   "Other Assets": { en: "Other Assets", es: "Otros Activos" },
@@ -172,8 +171,7 @@ export const translations: Translations = {
   "Fixed Income Funds": { en: "Fixed Income Funds", es: "Fondos de Renta Fija" },
   "Other": { en: "Other", es: "Otro" },
   "All Currencies / Assets": { en: "All Currencies / Assets", es: "Todas las Divisas / Activos" },
-  "Updated Before": { en: "Updated Before", es: "Actualizado Antes De" },
-  "Clear": { en: "Clear", es: "Limpiar" }
+  "Updated Before": { en: "Updated Before", es: "Actualizado Antes De" }
 };
 
 interface LanguageContextType {
