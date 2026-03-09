@@ -10,9 +10,10 @@ interface Props {
   onSave: (inv: Investment) => void;
   initialData?: Investment | null;
   investments?: Investment[];
+  prices?: Record<string, number>;
 }
 
-export function InvestmentModal({ isOpen, onClose, onSave, initialData, investments = [] }: Props) {
+export function InvestmentModal({ isOpen, onClose, onSave, initialData, investments = [], prices = {} }: Props) {
   const { t } = useLanguage();
   const [formData, setFormData] = useState<Partial<Investment>>({});
   const [isAssetSelectorOpen, setIsAssetSelectorOpen] = useState(false);
@@ -128,6 +129,7 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData, investme
           setFormData({ ...formData, currency: asset });
           setIsAssetSelectorOpen(false);
         }}
+        portfolioPrices={prices}
       />
     </div>
   );

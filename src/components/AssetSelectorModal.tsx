@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Loader2, AlertCircle, TrendingUp } from 'lucide-react';
+import { X, Search, Loader2, AlertCircle, TrendingUp, Globe } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
-import { fetchAssetPrice } from '../services/marketData';
+import { fetchAssetPrice, searchMarketAssets, MarketSearchResult } from '../services/marketData';
 
 interface AssetSelectorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (asset: string) => void;
+  portfolioPrices?: Record<string, number>;
 }
 
 const PREDEFINED_ASSETS = [
@@ -29,32 +30,21 @@ const PREDEFINED_ASSETS = [
   { symbol: 'NASDAQ', name: 'NASDAQ 100', type: 'Index' },
 ];
 
-export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorModalProps) {
+export function AssetSelectorModal({ isOpen, onClose, onSelect, portfolioPrices = {} }: AssetSelectorModalProps) {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [prices, setPrices] = useState<Record<string, number | null>>({});
   const [loadingPrices, setLoadingPrices] = useState<Record<string, boolean>>({});
   
-  const [customAsset, setCustomAsset] = useState<{symbol: string, price: number | null} | null>(null);
-  const [isSearchingCustom, setIsSearchingCustom] = useState(false);
-  const [customSearchError, setCustomSearchError] = useState(false);
+  const [marketResults, setMarketResults] = useState<MarketSearchResult[]>([]);
+  const [isSearchingMarket, setIsSearchingMarket] = useState(false);
+  const [marketSearchError, setMarketSearchError] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSearchTerm('');
-      setCustomAsset(null);
-      setCustomSearchError(false);
-      
-      // Fetch prices for predefined assets that we don't have yet
-      PREDEFINED_ASSETS.forEach(asset => {
-        if (prices[asset.symbol] === undefined && !loadingPrices[asset.symbol]) {
-          setLoadingPrices(prev => ({ ...prev, [asset.symbol]: true }));
-          fetchAssetPrice(asset.symbol).then(price => {
-            setPrices(prev => ({ ...prev, [asset.symbol]: price }));
-            setLoadingPrices(prev => ({ ...prev, [asset.symbol]: false }));
-          });
-        }
-      });
+      setMarketResults([]);
+      setMarketSearchError(false);
     }
   }, [isOpen]);
 
@@ -65,21 +55,30 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
     a.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCustomSearch = async () => {
+  const handleMarketSearch = async () => {
     if (!searchTerm) return;
-    const upperSearch = searchTerm.toUpperCase();
-    setIsSearchingCustom(true);
-    setCustomSearchError(false);
+    setIsSearchingMarket(true);
+    setMarketSearchError(false);
+    setMarketResults([]);
     
-    const price = await fetchAssetPrice(upperSearch);
-    if (price !== null) {
-      setCustomAsset({ symbol: upperSearch, price });
-      setPrices(prev => ({ ...prev, [upperSearch]: price }));
+    const results = await searchMarketAssets(searchTerm);
+    
+    if (results.length > 0) {
+      setMarketResults(results);
+      // Fetch prices for the results
+      results.forEach(result => {
+        if (prices[result.symbol] === undefined && !loadingPrices[result.symbol]) {
+          setLoadingPrices(prev => ({ ...prev, [result.symbol]: true }));
+          fetchAssetPrice(result.symbol).then(price => {
+            setPrices(prev => ({ ...prev, [result.symbol]: price }));
+            setLoadingPrices(prev => ({ ...prev, [result.symbol]: false }));
+          });
+        }
+      });
     } else {
-      setCustomSearchError(true);
-      setCustomAsset(null);
+      setMarketSearchError(true);
     }
-    setIsSearchingCustom(false);
+    setIsSearchingMarket(false);
   };
 
   const formatPrice = (price: number | null) => {
@@ -107,12 +106,12 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                setCustomSearchError(false);
+                setMarketSearchError(false);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleCustomSearch();
+                  handleMarketSearch();
                 }
               }}
               autoFocus
@@ -121,21 +120,21 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
         </div>
 
         <div className="flex-1 overflow-y-auto p-2">
-          {searchTerm && filteredPredefined.length === 0 && !customAsset && (
+          {searchTerm && filteredPredefined.length === 0 && marketResults.length === 0 && (
             <div className="p-4 text-center">
               <p className="text-sm text-slate-600 mb-4">
                 {t("No predefined assets found for")} "{searchTerm}".
               </p>
               <button
-                onClick={handleCustomSearch}
-                disabled={isSearchingCustom}
+                onClick={handleMarketSearch}
+                disabled={isSearchingMarket}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-medium hover:bg-indigo-100 transition-colors disabled:opacity-50"
               >
-                {isSearchingCustom ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                {isSearchingMarket ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
                 {t("Search market for")} "{searchTerm.toUpperCase()}"
               </button>
               
-              {customSearchError && (
+              {marketSearchError && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
                   <AlertCircle className="w-4 h-4" />
                   {t("Asset not found or no market quote available.")}
@@ -144,43 +143,19 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
             </div>
           )}
 
-          {customAsset && (
+          {marketResults.length > 0 && (
             <div className="mb-4">
-              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                {t("Search Result")}
-              </h3>
-              <button
-                onClick={() => onSelect(customAsset.symbol)}
-                className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg transition-colors text-left group border border-indigo-100 bg-indigo-50/30"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
-                    {customAsset.symbol.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-slate-900">{customAsset.symbol}</div>
-                    <div className="text-xs text-slate-500">{t("Custom Asset")}</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono font-medium text-slate-900">
-                    {formatPrice(customAsset.price)}
-                  </div>
-                  <div className="text-[10px] text-emerald-600 flex items-center justify-end gap-1 mt-0.5">
-                    <TrendingUp className="w-3 h-3" /> {t("Live Quote")}
-                  </div>
-                </div>
-              </button>
-            </div>
-          )}
-
-          {filteredPredefined.length > 0 && (
-            <div>
-              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                {searchTerm ? t("Search Results") : t("Popular Assets")}
+              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex justify-between items-center">
+                <span>{t("Market Results")}</span>
+                <button 
+                  onClick={() => setMarketResults([])}
+                  className="text-indigo-600 hover:text-indigo-700 text-[10px] font-medium"
+                >
+                  {t("Clear")}
+                </button>
               </h3>
               <div className="space-y-1">
-                {filteredPredefined.map(asset => {
+                {marketResults.map(asset => {
                   const price = prices[asset.symbol];
                   const isLoading = loadingPrices[asset.symbol];
                   const hasQuote = price !== null && price !== undefined;
@@ -189,11 +164,85 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
                     <button
                       key={asset.symbol}
                       onClick={() => {
-                        if (hasQuote || asset.symbol === 'USD') onSelect(asset.symbol);
+                        if (hasQuote) onSelect(asset.symbol);
                       }}
-                      disabled={!hasQuote && !isLoading && asset.symbol !== 'USD'}
+                      disabled={!hasQuote && !isLoading}
+                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors text-left group border border-indigo-50
+                        ${(!hasQuote && !isLoading) ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'hover:bg-indigo-50 cursor-pointer bg-white'}
+                      `}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="w-10 h-10 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
+                          {asset.symbol.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-900 truncate">{asset.symbol}</div>
+                          <div className="text-xs text-slate-500 truncate">{asset.name}</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">{asset.exchange} • {asset.type}</div>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0 ml-2">
+                        {isLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-slate-400 inline-block" />
+                        ) : (
+                          <>
+                            <div className="font-mono font-medium text-slate-900">
+                              {formatPrice(price !== undefined ? price : null)}
+                            </div>
+                            {hasQuote ? (
+                              <div className="text-[10px] text-emerald-600 flex items-center justify-end gap-1 mt-0.5">
+                                <TrendingUp className="w-3 h-3" /> {t("Live Quote")}
+                              </div>
+                            ) : (
+                              <div className="text-[10px] text-red-500 mt-0.5">
+                                {t("No quote")}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {filteredPredefined.length > 0 && marketResults.length === 0 && (
+            <div>
+              <div className="flex justify-between items-center px-3 py-2">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {searchTerm ? t("Search Results") : t("Popular Assets")}
+                </h3>
+                {searchTerm && (
+                  <button
+                    onClick={handleMarketSearch}
+                    disabled={isSearchingMarket}
+                    className="text-indigo-600 hover:text-indigo-700 text-[10px] font-medium flex items-center gap-1"
+                  >
+                    {isSearchingMarket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Globe className="w-3 h-3" />}
+                    {t("Search Market")}
+                  </button>
+                )}
+              </div>
+              <div className="space-y-1">
+                {filteredPredefined.map(asset => {
+                  const localPrice = prices[asset.symbol];
+                  const portfolioPrice = portfolioPrices[asset.symbol];
+                  const price = localPrice !== undefined ? localPrice : portfolioPrice;
+                  const isLoading = loadingPrices[asset.symbol];
+                  const hasQuote = price !== null && price !== undefined;
+                  const isFailed = price === null;
+                  
+                  return (
+                    <button
+                      key={asset.symbol}
+                      onClick={() => {
+                        if (!isFailed) onSelect(asset.symbol);
+                      }}
+                      disabled={isFailed}
                       className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors text-left group
-                        ${(!hasQuote && !isLoading && asset.symbol !== 'USD') ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 cursor-pointer'}
+                        ${isFailed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 cursor-pointer'}
                       `}
                     >
                       <div className="flex items-center gap-3">
@@ -218,7 +267,7 @@ export function AssetSelectorModal({ isOpen, onClose, onSelect }: AssetSelectorM
                                 <TrendingUp className="w-3 h-3" /> {t("Live Quote")}
                               </div>
                             )}
-                            {!hasQuote && asset.symbol !== 'USD' && (
+                            {isFailed && asset.symbol !== 'USD' && (
                               <div className="text-[10px] text-red-500 mt-0.5">
                                 {t("No quote")}
                               </div>

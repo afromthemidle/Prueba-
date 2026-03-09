@@ -264,19 +264,19 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
                 </div>
 
                 {/* Amount */}
-                <div className="relative w-32">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">
-                    {inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : inv.currency === 'GBP' ? '£' : inv.currency === 'JPY' ? '¥' : ''}
-                  </span>
+                <div className="flex items-center rounded-md border border-slate-200 bg-slate-50 focus-within:border-slate-400 focus-within:bg-white transition-colors overflow-hidden w-36">
                   <input
                     type="number"
                     min="0"
                     step="any"
                     placeholder="0"
-                    className={`w-full ${['USD', 'EUR', 'GBP', 'JPY'].includes(inv.currency) ? 'pl-6' : 'pl-2.5'} pr-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:border-slate-400 text-right font-mono text-sm font-medium bg-slate-50 hover:bg-white transition-colors`}
+                    className="w-full pl-3 pr-2 py-1.5 bg-transparent focus:outline-none text-right font-mono text-sm font-medium"
                     value={amounts[inv.id] || ''}
                     onChange={(e) => onAmountChange(inv.id, parseFloat(e.target.value) || 0)}
                   />
+                  <span className="pr-3 pl-1 text-slate-400 font-medium text-xs whitespace-nowrap select-none">
+                    {inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : inv.currency === 'GBP' ? '£' : inv.currency === 'JPY' ? '¥' : inv.currency.split('.')[0].substring(0, 5)}
+                  </span>
                 </div>
 
                 {/* Value in USD */}
@@ -313,6 +313,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
         onSave={handleSave} 
         initialData={editingInv} 
         investments={investments}
+        prices={prices}
       />
       <AIUploadModal 
         isOpen={isUploadOpen} 
