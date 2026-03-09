@@ -12,16 +12,14 @@ import { Filter, Save, History, TrendingUp } from 'lucide-react';
 interface DashboardStatsProps {
   investments: Investment[];
   amounts: Record<string, number>;
+  prices: Record<string, number>;
   snapshots: PortfolioSnapshot[];
   onSaveSnapshot: () => void;
   isSaving: boolean;
 }
 
-const EUR_TO_USD = 1.08; // Approximate conversion rate for total net worth
-
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
-export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot, isSaving }: DashboardStatsProps) {
+export function DashboardStats({ investments, amounts, prices, snapshots, onSaveSnapshot, isSaving }: DashboardStatsProps) {
+  const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
   const { t } = useLanguage();
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
@@ -51,7 +49,7 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
       const amount = amounts[inv.id] || 0;
       if (amount <= 0) return;
 
-      const amountUSD = amount * (inv.currency === 'EUR' ? 1.08 : inv.currency === 'GBP' ? 1.27 : inv.currency === 'JPY' ? 0.0067 : 1);
+      const amountUSD = amount * (prices[inv.currency] || 1);
       totalUSD += amountUSD;
 
       byCountry[inv.country] = (byCountry[inv.country] || 0) + amountUSD;
@@ -101,7 +99,7 @@ export function DashboardStats({ investments, amounts, snapshots, onSaveSnapshot
       topByAmount,
       upcomingMaturities
     };
-  }, [investments, amounts, filterSector, filterType, filterCurrency]);
+  }, [investments, amounts, prices, filterSector, filterType, filterCurrency]);
 
   const historyChartData = useMemo(() => {
     if (!snapshots || snapshots.length === 0) return [];

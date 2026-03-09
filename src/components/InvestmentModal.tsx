@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
-import { X } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { AssetSelectorModal } from './AssetSelectorModal';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSave: (inv: Investment) => void;
   initialData?: Investment | null;
+  investments?: Investment[];
 }
 
-export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props) {
+export function InvestmentModal({ isOpen, onClose, onSave, initialData, investments = [] }: Props) {
   const { t } = useLanguage();
   const [formData, setFormData] = useState<Partial<Investment>>({});
+  const [isAssetSelectorOpen, setIsAssetSelectorOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,6 +31,7 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
           sector: 'Others'
         });
       }
+      setIsAssetSelectorOpen(false);
     }
   }, [isOpen, initialData]);
 
@@ -71,34 +75,16 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Currency / Asset")}</label>
-              <input 
-                type="text" 
-                list="assets-list"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" 
-                value={formData.currency || 'USD'} 
-                onChange={e => setFormData({...formData, currency: e.target.value.toUpperCase()})}
-                placeholder="e.g. USD, EUR, BTC, AAPL"
-              />
-              <datalist id="assets-list">
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="JPY">JPY (¥)</option>
-                <option value="BTC">Bitcoin (BTC)</option>
-                <option value="ETH">Ethereum (ETH)</option>
-                <option value="SOL">Solana (SOL)</option>
-                <option value="ADA">Cardano (ADA)</option>
-                <option value="XRP">Ripple (XRP)</option>
-                <option value="S&P 500">S&P 500</option>
-                <option value="MSCI World">MSCI World</option>
-                <option value="NASDAQ">NASDAQ 100</option>
-                <option value="AAPL">Apple (AAPL)</option>
-                <option value="MSFT">Microsoft (MSFT)</option>
-                <option value="GOOGL">Alphabet (GOOGL)</option>
-                <option value="AMZN">Amazon (AMZN)</option>
-                <option value="TSLA">Tesla (TSLA)</option>
-                <option value="NVDA">NVIDIA (NVDA)</option>
-              </datalist>
+              <button
+                type="button"
+                onClick={() => setIsAssetSelectorOpen(true)}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm text-left flex justify-between items-center"
+              >
+                <span className={formData.currency ? "text-slate-900 font-medium" : "text-slate-400"}>
+                  {formData.currency || t("Select Asset...")}
+                </span>
+                <Search className="w-4 h-4 text-slate-400" />
+              </button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -134,6 +120,15 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData }: Props)
           </div>
         </form>
       </div>
+      
+      <AssetSelectorModal
+        isOpen={isAssetSelectorOpen}
+        onClose={() => setIsAssetSelectorOpen(false)}
+        onSelect={(asset) => {
+          setFormData({ ...formData, currency: asset });
+          setIsAssetSelectorOpen(false);
+        }}
+      />
     </div>
   );
 }

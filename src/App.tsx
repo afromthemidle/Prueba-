@@ -10,6 +10,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { PortfolioSnapshot } from './data/investments';
+import { fetchAssetPrice } from './services/marketData';
 
 export default function App() {
   const { t, language, setLanguage } = useLanguage();
@@ -34,6 +35,38 @@ export default function App() {
     const saved = localStorage.getItem('portfolioSnapshots_v2');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const [prices, setPrices] = useState<Record<string, number>>({});
+  const [isLoadingPrices, setIsLoadingPrices] = useState(false);
+
+  // Fetch live prices for all unique assets in the portfolio
+  useEffect(() => {
+    const fetchPrices = async () => {
+      setIsLoadingPrices(true);
+      const uniqueAssets = Array.from(new Set(investments.map(inv => inv.currency)));
+      const newPrices: Record<string, number> = { ...prices };
+      
+      let updated = false;
+      await Promise.all(uniqueAssets.map(async (asset) => {
+        if (!newPrices[asset]) {
+          const price = await fetchAssetPrice(asset);
+          if (price !== null) {
+            newPrices[asset] = price;
+            updated = true;
+          }
+        }
+      }));
+      
+      if (updated) {
+        setPrices(newPrices);
+      }
+      setIsLoadingPrices(false);
+    };
+    
+    if (investments.length > 0) {
+      fetchPrices();
+    }
+  }, [investments]);
 
   const previousUserRef = useRef(user);
 
@@ -219,7 +252,8 @@ export default function App() {
     try {
       const totalNetWorth = investments.reduce((sum, inv) => {
         const amount = amounts[inv.id] || 0;
-        return sum + amount;
+        const price = prices[inv.currency] || 1;
+        return sum + (amount * price);
       }, 0);
 
       const newSnapshot: PortfolioSnapshot = {
@@ -355,6 +389,8 @@ export default function App() {
               <InvestmentList 
                 investments={investments} 
                 amounts={amounts} 
+                prices={prices}
+                isLoadingPrices={isLoadingPrices}
                 onAmountChange={handleAmountChange} 
                 onAdd={handleAddInvestment}
                 onUpdate={handleUpdateInvestment}
@@ -369,6 +405,7 @@ export default function App() {
               <DashboardStats 
                 investments={investments} 
                 amounts={amounts} 
+                prices={prices}
                 snapshots={snapshots}
                 onSaveSnapshot={handleSaveSnapshot}
                 isSaving={isSavingSnapshot}

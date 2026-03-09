@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Investment, InvestmentSector, InvestmentType } from '../data/investments';
 import { formatPercent, formatDate } from '../lib/utils';
-import { Search, Plus, Upload, Edit2, Trash2, Filter, Clock } from 'lucide-react';
+import { Search, Plus, Upload, Edit2, Trash2, Filter, Clock, RefreshCw } from 'lucide-react';
 import { InvestmentModal } from './InvestmentModal';
 import { AIUploadModal } from './AIUploadModal';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -9,6 +9,8 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface InvestmentListProps {
   investments: Investment[];
   amounts: Record<string, number>;
+  prices: Record<string, number>;
+  isLoadingPrices: boolean;
   onAmountChange: (id: string, amount: number) => void;
   onAdd: (inv: Investment) => void;
   onUpdate: (id: string, inv: Partial<Investment>) => void;
@@ -16,7 +18,7 @@ interface InvestmentListProps {
   onAddMultiple: (invs: (Investment & { amount?: number })[], type: 'partial' | 'total') => void;
 }
 
-export function InvestmentList({ investments, amounts, onAmountChange, onAdd, onUpdate, onDelete, onAddMultiple }: InvestmentListProps) {
+export function InvestmentList({ investments, amounts, prices, isLoadingPrices, onAmountChange, onAdd, onUpdate, onDelete, onAddMultiple }: InvestmentListProps) {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
@@ -81,7 +83,15 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
   return (
     <div className="flex flex-col h-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">{t("Your Investments")}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900">{t("Your Investments")}</h2>
+          {isLoadingPrices && (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs font-medium animate-pulse">
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              {t("Updating prices...")}
+            </div>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <button 
@@ -273,10 +283,18 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
                 <div className="w-24 text-right">
                   <div className="font-mono text-sm font-semibold text-slate-900">
                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
-                      (amounts[inv.id] || 0) * (inv.currency === 'EUR' ? 1.08 : inv.currency === 'GBP' ? 1.27 : inv.currency === 'JPY' ? 0.0067 : 1)
+                      (amounts[inv.id] || 0) * (prices[inv.currency] || 1)
                     )}
                   </div>
-                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">{t("USD Value")}</div>
+                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
+                    {prices[inv.currency] && inv.currency !== 'USD' ? (
+                      <span className="text-indigo-500" title={t("Live Price")}>
+                        1 {inv.currency} = ${prices[inv.currency].toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                      </span>
+                    ) : (
+                      t("USD Value")
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -294,6 +312,7 @@ export function InvestmentList({ investments, amounts, onAmountChange, onAdd, on
         onClose={() => setIsModalOpen(false)} 
         onSave={handleSave} 
         initialData={editingInv} 
+        investments={investments}
       />
       <AIUploadModal 
         isOpen={isUploadOpen} 
