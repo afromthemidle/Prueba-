@@ -52,7 +52,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
     return matchesSearch && matchesSector && matchesType && matchesUpdateDate;
   });
 
-  const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
+  const sectors: InvestmentSector[] = ['Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
 
   const handleEdit = (inv: Investment) => {
     setEditingInv(inv);

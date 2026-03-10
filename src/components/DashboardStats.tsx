@@ -124,7 +124,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
     });
   }, [snapshots]);
 
-  const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
+  const sectors: InvestmentSector[] = ['Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
 
   if (stats.totalUSD === 0 && investments.length === 0) {
     return (

@@ -105,7 +105,7 @@ export function InvestmentModal({ isOpen, onClose, onSave, initialData, investme
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Sector")}</label>
               <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors outline-none text-sm" value={formData.sector || 'Others'} onChange={e => setFormData({...formData, sector: e.target.value as InvestmentSector})}>
-                {['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].map(s => (
+                {['Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].map(s => (
                   <option key={s} value={s}>{t(s)}</option>
                 ))}
               </select>

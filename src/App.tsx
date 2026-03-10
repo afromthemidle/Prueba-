@@ -304,7 +304,9 @@ export default function App() {
               {user ? (
                 <div className="flex items-center gap-3 ml-2">
                   <div className="flex flex-col items-end">
-                    <span className="text-xs font-medium text-slate-900">{user.email}</span>
+                    <span className="text-xs font-medium text-slate-900 max-w-[80px] sm:max-w-[120px] truncate" title={user.email || ''}>
+                      {user.email?.split('@')[0]}
+                    </span>
                     <span className="text-[10px] text-emerald-600 font-medium">{t("Cloud Sync Active")}</span>
                   </div>
                   <button

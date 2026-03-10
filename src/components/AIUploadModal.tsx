@@ -53,7 +53,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
                   - currency: 'USD' or 'EUR' (default to USD if unknown)
                   - country: string (default to 'Global' if unknown)
                   - type: 'Fixed' or 'Variable'
-                  - sector: 'Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', or 'Others'
+                  - sector: 'Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', or 'Others'
                   - amount: number (the balance, value, or amount invested. If not found, omit or use 0)
                   - maturityDate: string (YYYY-MM-DD format. If not found, omit)
                   `
@@ -90,7 +90,7 @@ export function AIUploadModal({ isOpen, onClose, onSuccess }: Props) {
               id: Math.random().toString(36).substr(2, 9),
               currency: ['USD', 'EUR'].includes(inv.currency) ? inv.currency : 'USD',
               type: ['Fixed', 'Variable'].includes(inv.type) ? inv.type : 'Fixed',
-              sector: ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].includes(inv.sector) ? inv.sector : 'Others',
+              sector: ['Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'].includes(inv.sector) ? inv.sector : 'Others',
             }));
             onSuccess(newInvestments, importType);
             onClose();

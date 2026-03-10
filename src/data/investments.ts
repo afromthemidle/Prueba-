@@ -1,6 +1,9 @@
 export type InvestmentSector = 
   | 'Financial' 
-  | 'Cooperatives' 
+  | 'Technology'
+  | 'Healthcare'
+  | 'Consumer Goods'
+  | 'Industrials'
   | 'Energy' 
   | 'Cryptocurrencies' 
   | 'Real Estate' 

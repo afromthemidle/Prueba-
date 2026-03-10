@@ -56,7 +56,7 @@ export function AISuggestions() {
               properties: {
                 name: { type: Type.STRING, description: "Name of the investment or platform" },
                 type: { type: Type.STRING, description: "Must be exactly 'Fixed' or 'Variable'" },
-                sector: { type: Type.STRING, description: "Must be one of: 'Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'" },
+                sector: { type: Type.STRING, description: "Must be one of: 'Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'" },
                 interestRate: { type: Type.NUMBER, description: "Expected annual interest rate as a decimal (e.g., 0.05 for 5%)" },
                 website: { type: Type.STRING, description: "URL to the platform or more information" },
                 description: { type: Type.STRING, description: "Brief 1-sentence description of why this is a good option" }
@@ -82,7 +82,7 @@ export function AISuggestions() {
     }
   };
 
-  const sectors: InvestmentSector[] = ['Financial', 'Cooperatives', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
+  const sectors: InvestmentSector[] = ['Financial', 'Technology', 'Healthcare', 'Consumer Goods', 'Industrials', 'Energy', 'Cryptocurrencies', 'Real Estate', 'Others'];
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
