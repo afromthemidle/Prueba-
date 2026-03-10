@@ -288,8 +288,21 @@ export default function App() {
               <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+              >
+                <span>🇺🇸</span> EN
+              </button>
+              <button
+                onClick={() => setLanguage('es')}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+              >
+                <span>🇪🇸</span> ES
+              </button>
+              <div className="h-4 w-px bg-slate-200 mx-1"></div>
               {user ? (
-                <div className="flex items-center gap-3 mr-4">
+                <div className="flex items-center gap-3 ml-2">
                   <div className="flex flex-col items-end">
                     <span className="text-xs font-medium text-slate-900">{user.email}</span>
                     <span className="text-[10px] text-emerald-600 font-medium">{t("Cloud Sync Active")}</span>
@@ -305,25 +318,12 @@ export default function App() {
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 mr-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm shadow-slate-900/10"
+                  className="flex items-center gap-1.5 px-3 py-1.5 ml-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm shadow-slate-900/10"
                 >
                   <UserIcon className="w-3.5 h-3.5" />
                   {t("Sign In")}
                 </button>
               )}
-              <div className="h-4 w-px bg-slate-200 mx-1"></div>
-              <button
-                onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
-              >
-                <span>🇺🇸</span> EN
-              </button>
-              <button
-                onClick={() => setLanguage('es')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
-              >
-                <span>🇪🇸</span> ES
-              </button>
             </div>
           </div>
           
