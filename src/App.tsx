@@ -43,7 +43,7 @@ export default function App() {
   useEffect(() => {
     const fetchPrices = async () => {
       setIsLoadingPrices(true);
-      const uniqueAssets = Array.from(new Set(investments.map(inv => inv.currency))) as string[];
+      const uniqueAssets = Array.from(new Set(investments.map(inv => inv.currency || 'USD'))) as string[];
       const newPrices: Record<string, number> = { ...prices };
       
       let updated = false;
@@ -252,7 +252,7 @@ export default function App() {
     try {
       const totalNetWorth = investments.reduce((sum, inv) => {
         const amount = amounts[inv.id] || 0;
-        const price = prices[inv.currency] || 1;
+        const price = prices[inv.currency || 'USD'] || 1;
         return sum + (amount * price);
       }, 0);
 

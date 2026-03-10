@@ -32,7 +32,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
   const [editingInv, setEditingInv] = useState<Investment | null>(null);
 
   const filteredInvestments = investments.filter(inv => {
-    const matchesSearch = inv.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (inv.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSector = filterSector === 'All' || inv.sector === filterSector;
     const matchesType = filterType === 'All' || inv.type === filterType;
     
@@ -208,11 +208,11 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
             <div className="flex-1">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-slate-50/80 flex items-center justify-center text-slate-700 font-medium text-lg border border-slate-100/80">
-                  {inv.name.charAt(0)}
+                  {(inv.name || '?').charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-slate-900">{inv.name}</h3>
+                    <h3 className="font-semibold text-slate-900">{inv.name || 'Unnamed'}</h3>
                     <div className="flex items-center gap-1 ml-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => handleEdit(inv)} className="p-1 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors" title={t("Edit Investment")}>
                         <Edit2 className="w-3.5 h-3.5" />
@@ -275,7 +275,7 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
                     onChange={(e) => onAmountChange(inv.id, parseFloat(e.target.value) || 0)}
                   />
                   <span className="pr-3 pl-1 text-slate-400 font-medium text-xs whitespace-nowrap select-none">
-                    {inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : inv.currency === 'GBP' ? '£' : inv.currency === 'JPY' ? '¥' : inv.currency.split('.')[0].substring(0, 5)}
+                    {inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : inv.currency === 'GBP' ? '£' : inv.currency === 'JPY' ? '¥' : (inv.currency ? inv.currency.split('.')[0].substring(0, 5) : '$')}
                   </span>
                 </div>
 
@@ -283,13 +283,13 @@ export function InvestmentList({ investments, amounts, prices, isLoadingPrices, 
                 <div className="w-24 text-right">
                   <div className="font-mono text-sm font-semibold text-slate-900">
                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
-                      (amounts[inv.id] || 0) * (prices[inv.currency] || 1)
+                      (amounts[inv.id] || 0) * (prices[inv.currency || 'USD'] || 1)
                     )}
                   </div>
                   <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-                    {prices[inv.currency] && inv.currency !== 'USD' ? (
+                    {prices[inv.currency || 'USD'] && (inv.currency || 'USD') !== 'USD' ? (
                       <span className="text-indigo-500" title={t("Live Price")}>
-                        1 {inv.currency} = ${prices[inv.currency].toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                        1 {inv.currency || 'USD'} = ${prices[inv.currency || 'USD'].toLocaleString('en-US', { maximumFractionDigits: 2 })}
                       </span>
                     ) : (
                       t("USD Value")

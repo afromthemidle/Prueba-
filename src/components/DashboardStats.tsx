@@ -3,11 +3,12 @@ import { Investment, InvestmentSector, InvestmentType, PortfolioSnapshot } from 
 import { formatCurrency, formatPercent, formatDate, getDaysLeft } from '../lib/utils';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList,
   AreaChart, Area, LineChart, Line
 } from 'recharts';
 import { useLanguage } from '../i18n/LanguageContext';
 import { Filter, Save, History, TrendingUp } from 'lucide-react';
+import { SunburstChart, SunburstNode } from './SunburstChart';
 
 interface DashboardStatsProps {
   investments: Investment[];
@@ -41,7 +42,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
     const filteredInvestments = investments.filter(inv => {
       const matchesSector = filterSector === 'All' || inv.sector === filterSector;
       const matchesType = filterType === 'All' || inv.type === filterType;
-      const matchesCurrency = filterCurrency === 'All' || inv.currency === filterCurrency;
+      const matchesCurrency = filterCurrency === 'All' || (inv.currency || 'USD') === filterCurrency;
       return matchesSector && matchesType && matchesCurrency;
     });
 
@@ -49,11 +50,12 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       const amount = amounts[inv.id] || 0;
       if (amount <= 0) return;
 
-      const amountUSD = amount * (prices[inv.currency] || 1);
+      const currency = inv.currency || 'USD';
+      const amountUSD = amount * (prices[currency] || 1);
       totalUSD += amountUSD;
 
       byCountry[inv.country] = (byCountry[inv.country] || 0) + amountUSD;
-      byCurrency[inv.currency] = (byCurrency[inv.currency] || 0) + amountUSD; // Use USD equivalent for all charts
+      byCurrency[currency] = (byCurrency[currency] || 0) + amountUSD; // Use USD equivalent for all charts
       byType[inv.type] = (byType[inv.type] || 0) + amountUSD;
       bySector[inv.sector] = (bySector[inv.sector] || 0) + amountUSD;
 
@@ -61,6 +63,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       
       activeInvestments.push({
         ...inv,
+        currency,
         amount,
         amountUSD
       });
@@ -88,6 +91,29 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       .filter(inv => getDaysLeft(inv.maturityDate!) >= 0)
       .slice(0, 5);
 
+    // Build hierarchical data for Sunburst chart (Country -> Type -> Investment)
+    const sunburstRoot: SunburstNode = { name: 'Portfolio', children: [] };
+    const countryMap = new Map<string, SunburstNode>();
+
+    activeInvestments.forEach(inv => {
+      if (!countryMap.has(inv.country)) {
+        countryMap.set(inv.country, { name: inv.country, children: [] });
+      }
+      const countryNode = countryMap.get(inv.country)!;
+      
+      let typeNode = countryNode.children!.find(c => c.name === inv.type);
+      if (!typeNode) {
+        typeNode = { name: inv.type, children: [] };
+        countryNode.children!.push(typeNode);
+      }
+      
+      typeNode.children!.push({
+        name: inv.name || 'Unnamed',
+        value: inv.amountUSD
+      });
+    });
+    sunburstRoot.children = Array.from(countryMap.values());
+
     return {
       totalUSD,
       avgInterest,
@@ -97,7 +123,8 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       sectorData: formatChartData(bySector),
       topPaying,
       topByAmount,
-      upcomingMaturities
+      upcomingMaturities,
+      sunburstData: sunburstRoot
     };
   }, [investments, amounts, prices, filterSector, filterType, filterCurrency]);
 
@@ -142,10 +169,15 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const value = payload[0].value;
+      const percentage = stats.totalUSD > 0 ? ((value / stats.totalUSD) * 100).toFixed(1) : 0;
       return (
         <div className="bg-white p-3 border border-slate-200 shadow-md rounded-lg">
           <p className="font-medium text-slate-900">{t(payload[0].name)}</p>
-          <p className="text-indigo-600 font-mono">{formatCurrency(payload[0].value)}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-indigo-600 font-mono font-semibold">{formatCurrency(value)}</p>
+            <p className="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium">{percentage}%</p>
+          </div>
         </div>
       );
     }
@@ -213,7 +245,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
               onChange={(e) => setFilterCurrency(e.target.value)}
             >
               <option value="All">{t("All Currencies / Assets")}</option>
-              {Array.from(new Set(investments.map(inv => inv.currency))).map(c => (
+              {Array.from(new Set(investments.map(inv => inv.currency || 'USD'))).map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
@@ -407,15 +439,31 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
           <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Country")}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.countryData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} tickFormatter={(val) => `$${val/1000}k`} />
+              <BarChart data={stats.countryData} layout="vertical" margin={{ top: 5, right: 100, left: 0, bottom: 5 }}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} width={80} />
                 <Tooltip cursor={{ fill: '#f1f5f9' }} content={<CustomTooltip />} />
-                <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={24}>
+                  <LabelList 
+                    dataKey="value" 
+                    position="right" 
+                    formatter={(value: number) => `${formatCurrency(value)} (${stats.totalUSD > 0 ? ((value / stats.totalUSD) * 100).toFixed(1) : 0}%)`} 
+                    fill="#64748b" 
+                    fontSize={12} 
+                    fontWeight={500}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      {/* Sunburst Chart */}
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
+        <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Portfolio Hierarchy (Country > Type > Investment)")}</h3>
+        <div className="h-[500px] w-full">
+          <SunburstChart data={stats.sunburstData} />
         </div>
       </div>
 
