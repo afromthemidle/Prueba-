@@ -44,8 +44,22 @@ export function SunburstChart({ data }: SunburstChartProps) {
     const { width, height } = dimensions;
     const radius = Math.min(width, height) / 2;
 
-    // Create a color scale
-    const color = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1));
+    // Create a high-contrast color scale
+    const HIGH_CONTRAST_COLORS = [
+      '#ef4444', // red
+      '#3b82f6', // blue
+      '#10b981', // emerald
+      '#f59e0b', // amber
+      '#8b5cf6', // violet
+      '#ec4899', // pink
+      '#06b6d4', // cyan
+      '#f97316', // orange
+      '#6366f1', // indigo
+      '#84cc16', // lime
+      '#14b8a6', // teal
+      '#d946ef', // fuchsia
+    ];
+    const color = d3.scaleOrdinal(HIGH_CONTRAST_COLORS);
 
     // Compute the hierarchy
     const hierarchy = d3.hierarchy(data)
@@ -68,15 +82,19 @@ export function SunburstChart({ data }: SunburstChartProps) {
 
     // Generate paths for all descendants except the root
     const paths = root.descendants().filter(d => d.depth > 0).map((node, i) => {
-      // Color based on the top-level category (Country)
+      // Color based on the top-level category (Level 1)
       let ancestor = node;
       while (ancestor.depth > 1 && ancestor.parent) {
         ancestor = ancestor.parent;
       }
       
-      // Slightly adjust lightness based on depth to distinguish levels
+      // Adjust lightness and saturation based on depth to distinguish levels clearly
       const baseColor = d3.hsl(color(ancestor.data.name));
-      baseColor.l += (node.depth - 1) * 0.08; // Lighter as it goes deeper
+      if (node.depth > 1) {
+        // Increase lightness and decrease saturation for deeper levels to create strong contrast
+        baseColor.l = Math.min(0.95, baseColor.l + (node.depth - 1) * 0.12);
+        baseColor.s = Math.max(0.1, baseColor.s - (node.depth - 1) * 0.15);
+      }
       const fill = baseColor.toString();
 
       const percentageNum = totalValue > 0 ? ((node.value || 0) / totalValue) * 100 : 0;
