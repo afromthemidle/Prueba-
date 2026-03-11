@@ -154,13 +154,17 @@ export function SunburstChart({ data }: SunburstChartProps) {
             {p.showText && (
               <text
                 transform={`translate(${p.x}, ${p.y}) rotate(${p.rotate})`}
-                dy="0.35em"
                 textAnchor="middle"
                 fill="#ffffff"
-                className="text-[10px] font-semibold pointer-events-none select-none"
+                className="pointer-events-none select-none"
                 style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.6)' }}
               >
-                {p.percentage}%
+                <tspan x="0" dy="-0.2em" className="text-[9px] font-bold">
+                  {t(p.name).length > 12 ? t(p.name).substring(0, 10) + '...' : t(p.name)}
+                </tspan>
+                <tspan x="0" dy="1.2em" className="text-[8px] font-medium opacity-90">
+                  {p.percentage}%
+                </tspan>
               </text>
             )}
           </g>
