@@ -31,6 +31,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
   const [sunburstLevel1, setSunburstLevel1] = useState<SunburstCriterion>('country');
   const [sunburstLevel2, setSunburstLevel2] = useState<SunburstCriterion>('type');
   const [sunburstLevel3, setSunburstLevel3] = useState<SunburstCriterion>('currency');
+  const [hiddenSunburstLevel1Values, setHiddenSunburstLevel1Values] = useState<Set<string>>(new Set());
 
   const stats = useMemo(() => {
     let totalUSD = 0;
@@ -99,6 +100,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
 
     // Build hierarchical data for Sunburst chart
     const sunburstRoot: SunburstNode = { name: 'Portfolio', children: [] };
+    const allSunburstLevel1Values = new Set<string>();
     
     const getCriterionValue = (inv: Investment, criterion: SunburstCriterion) => {
       switch (criterion) {
@@ -112,6 +114,12 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
 
     activeInvestments.forEach(inv => {
       const val1 = getCriterionValue(inv, sunburstLevel1);
+      allSunburstLevel1Values.add(val1);
+
+      if (hiddenSunburstLevel1Values.has(val1)) {
+        return;
+      }
+
       const val2 = getCriterionValue(inv, sunburstLevel2);
       const val3 = getCriterionValue(inv, sunburstLevel3);
 
@@ -149,9 +157,10 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       topPaying,
       topByAmount,
       upcomingMaturities,
-      sunburstData: sunburstRoot
+      sunburstData: sunburstRoot,
+      sunburstLevel1Values: Array.from(allSunburstLevel1Values).sort()
     };
-  }, [investments, amounts, prices, filterSector, filterType, filterCurrency, sunburstLevel1, sunburstLevel2, sunburstLevel3]);
+  }, [investments, amounts, prices, filterSector, filterType, filterCurrency, sunburstLevel1, sunburstLevel2, sunburstLevel3, hiddenSunburstLevel1Values]);
 
   const historyChartData = useMemo(() => {
     if (!snapshots || snapshots.length === 0) return [];
@@ -513,7 +522,10 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
               <select 
                 className="px-2 py-1 rounded-md border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-indigo-400 transition-colors"
                 value={sunburstLevel1}
-                onChange={(e) => setSunburstLevel1(e.target.value as SunburstCriterion)}
+                onChange={(e) => {
+                  setSunburstLevel1(e.target.value as SunburstCriterion);
+                  setHiddenSunburstLevel1Values(new Set());
+                }}
               >
                 <option value="country">{t("Country")}</option>
                 <option value="type">{t("Type")}</option>
@@ -548,8 +560,34 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
               </select>
             </div>
           </div>
-          <div className="flex-1 min-h-0 relative">
-            <SunburstChart data={stats.sunburstData} />
+          <div className="flex-1 min-h-0 relative flex gap-4">
+            {/* Sidebar for checkboxes */}
+            <div className="w-36 overflow-y-auto border-r border-slate-100 pr-2 flex flex-col gap-2 shrink-0">
+               <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t("Filter Level 1")}</h4>
+               {stats.sunburstLevel1Values.map(val => (
+                 <label key={val} className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer hover:text-indigo-600 transition-colors">
+                   <input
+                     type="checkbox"
+                     className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5"
+                     checked={!hiddenSunburstLevel1Values.has(val)}
+                     onChange={(e) => {
+                       const newHidden = new Set(hiddenSunburstLevel1Values);
+                       if (e.target.checked) {
+                         newHidden.delete(val);
+                       } else {
+                         newHidden.add(val);
+                       }
+                       setHiddenSunburstLevel1Values(newHidden);
+                     }}
+                   />
+                   <span className="truncate" title={t(val)}>{t(val)}</span>
+                 </label>
+               ))}
+            </div>
+            {/* Chart */}
+            <div className="flex-1 min-w-0 relative">
+              <SunburstChart data={stats.sunburstData} />
+            </div>
           </div>
         </div>
       </ChartCard>
