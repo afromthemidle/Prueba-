@@ -7,7 +7,7 @@ import {
   AreaChart, Area, LineChart, Line
 } from 'recharts';
 import { useLanguage } from '../i18n/LanguageContext';
-import { Filter, Save, History, TrendingUp, Maximize2, Minimize2 } from 'lucide-react';
+import { Filter, Save, History, TrendingUp, Maximize2, Minimize2, Info } from 'lucide-react';
 import { SunburstChart, SunburstNode } from './SunburstChart';
 
 interface DashboardStatsProps {
@@ -516,7 +516,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       {/* Sunburst Chart */}
       <ChartCard id="sunburst" title={t("Portfolio Hierarchy")} heightClass="h-[500px]">
         <div className="flex flex-col h-full">
-          <div className="flex flex-wrap gap-4 mb-4">
+          <div className="flex flex-wrap gap-4 mb-4 items-center">
             <div className="flex items-center gap-2">
               <label className="text-xs font-semibold text-slate-500 uppercase">{t("Level 1")}</label>
               <select 
@@ -558,6 +558,10 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
                 <option value="currency">{t("Currency")}</option>
                 <option value="sector">{t("Sector")}</option>
               </select>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-indigo-600 bg-indigo-50 px-2.5 py-1.5 rounded-md ml-auto">
+              <Info className="w-4 h-4" />
+              <span className="font-medium">{t("Best viewed in full screen or on a large display")}</span>
             </div>
           </div>
           <div className="flex-1 min-h-0 relative flex gap-4">

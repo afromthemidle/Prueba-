@@ -174,7 +174,16 @@ export const translations: Translations = {
   "Fixed Income Funds": { en: "Fixed Income Funds", es: "Fondos de Renta Fija" },
   "Other": { en: "Other", es: "Otro" },
   "All Currencies / Assets": { en: "All Currencies / Assets", es: "Todas las Divisas / Activos" },
-  "Updated Before": { en: "Updated Before", es: "Actualizado Antes De" }
+  "Updated Before": { en: "Updated Before", es: "Actualizado Antes De" },
+  "Portfolio Hierarchy": { en: "Portfolio Hierarchy", es: "Jerarquía del Portafolio" },
+  "Level 1": { en: "Level 1", es: "Nivel 1" },
+  "Level 2": { en: "Level 2", es: "Nivel 2" },
+  "Level 3": { en: "Level 3", es: "Nivel 3" },
+  "Filter Level 1": { en: "Filter Level 1", es: "Filtrar Nivel 1" },
+  "Best viewed in full screen or on a large display": { en: "Best viewed in full screen or on a large display", es: "Mejor visualización en pantalla completa o en un monitor grande" },
+  "Type": { en: "Type", es: "Tipo" },
+  "Maximize": { en: "Maximize", es: "Maximizar" },
+  "Minimize": { en: "Minimize", es: "Minimizar" }
 };
 
 interface LanguageContextType {
