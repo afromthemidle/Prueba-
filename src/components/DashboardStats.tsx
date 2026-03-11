@@ -19,6 +19,8 @@ interface DashboardStatsProps {
   isSaving: boolean;
 }
 
+export type SunburstCriterion = 'country' | 'type' | 'currency' | 'sector';
+
 export function DashboardStats({ investments, amounts, prices, snapshots, onSaveSnapshot, isSaving }: DashboardStatsProps) {
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
   const { t } = useLanguage();
@@ -26,6 +28,9 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
   const [filterCurrency, setFilterCurrency] = useState<string>('All');
   const [expandedChart, setExpandedChart] = useState<string | null>(null);
+  const [sunburstLevel1, setSunburstLevel1] = useState<SunburstCriterion>('country');
+  const [sunburstLevel2, setSunburstLevel2] = useState<SunburstCriterion>('type');
+  const [sunburstLevel3, setSunburstLevel3] = useState<SunburstCriterion>('currency');
 
   const stats = useMemo(() => {
     let totalUSD = 0;
@@ -92,35 +97,47 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       .filter(inv => getDaysLeft(inv.maturityDate!) >= 0)
       .slice(0, 5);
 
-    // Build hierarchical data for Sunburst chart (Country -> Type -> Currency -> Investment)
+    // Build hierarchical data for Sunburst chart
     const sunburstRoot: SunburstNode = { name: 'Portfolio', children: [] };
-    const countryMap = new Map<string, SunburstNode>();
+    
+    const getCriterionValue = (inv: Investment, criterion: SunburstCriterion) => {
+      switch (criterion) {
+        case 'country': return inv.country || 'Unknown';
+        case 'type': return inv.type || 'Unknown';
+        case 'currency': return inv.currency || 'USD';
+        case 'sector': return inv.sector || 'Unknown';
+        default: return 'Unknown';
+      }
+    };
 
     activeInvestments.forEach(inv => {
-      if (!countryMap.has(inv.country)) {
-        countryMap.set(inv.country, { name: inv.country, children: [] });
-      }
-      const countryNode = countryMap.get(inv.country)!;
-      
-      let typeNode = countryNode.children!.find(c => c.name === inv.type);
-      if (!typeNode) {
-        typeNode = { name: inv.type, children: [] };
-        countryNode.children!.push(typeNode);
-      }
-      
-      const currency = inv.currency || 'USD';
-      let currencyNode = typeNode.children!.find(c => c.name === currency);
-      if (!currencyNode) {
-        currencyNode = { name: currency, children: [] };
-        typeNode.children!.push(currencyNode);
+      const val1 = getCriterionValue(inv, sunburstLevel1);
+      const val2 = getCriterionValue(inv, sunburstLevel2);
+      const val3 = getCriterionValue(inv, sunburstLevel3);
+
+      let node1 = sunburstRoot.children!.find(c => c.name === val1);
+      if (!node1) {
+        node1 = { name: val1, children: [] };
+        sunburstRoot.children!.push(node1);
       }
       
-      currencyNode.children!.push({
+      let node2 = node1.children!.find(c => c.name === val2);
+      if (!node2) {
+        node2 = { name: val2, children: [] };
+        node1.children!.push(node2);
+      }
+      
+      let node3 = node2.children!.find(c => c.name === val3);
+      if (!node3) {
+        node3 = { name: val3, children: [] };
+        node2.children!.push(node3);
+      }
+      
+      node3.children!.push({
         name: inv.name || 'Unnamed',
         value: inv.amountUSD
       });
     });
-    sunburstRoot.children = Array.from(countryMap.values());
 
     return {
       totalUSD,
@@ -134,7 +151,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       upcomingMaturities,
       sunburstData: sunburstRoot
     };
-  }, [investments, amounts, prices, filterSector, filterType, filterCurrency]);
+  }, [investments, amounts, prices, filterSector, filterType, filterCurrency, sunburstLevel1, sunburstLevel2, sunburstLevel3]);
 
   const historyChartData = useMemo(() => {
     if (!snapshots || snapshots.length === 0) return [];
@@ -488,8 +505,53 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       </div>
 
       {/* Sunburst Chart */}
-      <ChartCard id="sunburst" title={t("Portfolio Hierarchy (Country > Type > Currency > Investment)")} heightClass="h-[500px]">
-        <SunburstChart data={stats.sunburstData} />
+      <ChartCard id="sunburst" title={t("Portfolio Hierarchy")} heightClass="h-[500px]">
+        <div className="flex flex-col h-full">
+          <div className="flex flex-wrap gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase">{t("Level 1")}</label>
+              <select 
+                className="px-2 py-1 rounded-md border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-indigo-400 transition-colors"
+                value={sunburstLevel1}
+                onChange={(e) => setSunburstLevel1(e.target.value as SunburstCriterion)}
+              >
+                <option value="country">{t("Country")}</option>
+                <option value="type">{t("Type")}</option>
+                <option value="currency">{t("Currency")}</option>
+                <option value="sector">{t("Sector")}</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase">{t("Level 2")}</label>
+              <select 
+                className="px-2 py-1 rounded-md border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-indigo-400 transition-colors"
+                value={sunburstLevel2}
+                onChange={(e) => setSunburstLevel2(e.target.value as SunburstCriterion)}
+              >
+                <option value="country">{t("Country")}</option>
+                <option value="type">{t("Type")}</option>
+                <option value="currency">{t("Currency")}</option>
+                <option value="sector">{t("Sector")}</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase">{t("Level 3")}</label>
+              <select 
+                className="px-2 py-1 rounded-md border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:border-indigo-400 transition-colors"
+                value={sunburstLevel3}
+                onChange={(e) => setSunburstLevel3(e.target.value as SunburstCriterion)}
+              >
+                <option value="country">{t("Country")}</option>
+                <option value="type">{t("Type")}</option>
+                <option value="currency">{t("Currency")}</option>
+                <option value="sector">{t("Sector")}</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex-1 min-h-0 relative">
+            <SunburstChart data={stats.sunburstData} />
+          </div>
+        </div>
       </ChartCard>
 
       {/* Top Investments Grid */}
