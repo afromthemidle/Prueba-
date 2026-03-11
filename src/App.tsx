@@ -4,7 +4,7 @@ import { InvestmentList } from './components/InvestmentList';
 import { DashboardStats } from './components/DashboardStats';
 import { AISuggestions } from './components/AISuggestions';
 import { AuthModal } from './components/AuthModal';
-import { LayoutDashboard, Wallet, Sparkles, TrendingUp, User as UserIcon, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, Sparkles, TrendingUp, User as UserIcon, LogOut, Cloud } from 'lucide-react';
 import { useLanguage } from './i18n/LanguageContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from './contexts/AuthContext';
@@ -318,13 +318,18 @@ export default function App() {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 ml-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm shadow-slate-900/10"
-                >
-                  <UserIcon className="w-3.5 h-3.5" />
-                  {t("Sign In")}
-                </button>
+                <div className="flex items-center gap-3 ml-2">
+                  <span className="hidden md:inline-block text-[10px] text-slate-500 max-w-[250px] text-right leading-tight">
+                    {t("To save data to the cloud, a new account must be created and a session started within the application.")}
+                  </span>
+                  <button
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm shadow-slate-900/10 shrink-0"
+                  >
+                    <UserIcon className="w-3.5 h-3.5" />
+                    {t("Sign In")}
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -384,6 +389,22 @@ export default function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!user && (
+          <div className="mb-6 bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 shadow-sm">
+            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center shrink-0">
+              <Cloud className="w-4 h-4 text-indigo-600" />
+            </div>
+            <p className="text-sm text-indigo-900 font-medium">
+              {t("To save data to the cloud, a new account must be created and a session started within the application.")}
+            </p>
+            <button 
+              onClick={() => setIsAuthModalOpen(true)}
+              className="mt-2 sm:mt-0 sm:ml-auto shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+            >
+              {t("Sign In")}
+            </button>
+          </div>
+        )}
         {/* Content Area */}
         <div className="h-[calc(100vh-12rem)] min-h-[600px]">
           {activeTab === 'portfolio' && (

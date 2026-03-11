@@ -183,7 +183,8 @@ export const translations: Translations = {
   "Best viewed in full screen or on a large display": { en: "Best viewed in full screen or on a large display", es: "Mejor visualización en pantalla completa o en un monitor grande" },
   "Type": { en: "Type", es: "Tipo" },
   "Maximize": { en: "Maximize", es: "Maximizar" },
-  "Minimize": { en: "Minimize", es: "Minimizar" }
+  "Minimize": { en: "Minimize", es: "Minimizar" },
+  "To save data to the cloud, a new account must be created and a session started within the application.": { en: "To save data to the cloud, a new account must be created and a session started within the application.", es: "Para guardar datos en la nube, se debe crear una cuenta nueva e iniciar sesión en la aplicación." }
 };
 
 interface LanguageContextType {
