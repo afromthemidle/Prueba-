@@ -280,29 +280,16 @@ export default function App() {
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center py-3 min-h-[4rem]">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center shadow-md shadow-slate-900/10">
                 <TrendingUp className="w-4 h-4 text-white" />
               </div>
               <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("Wealth Tracker")}</h1>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'en' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
-              >
-                <span>🇺🇸</span> EN
-              </button>
-              <button
-                onClick={() => setLanguage('es')}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${language === 'es' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
-              >
-                <span>🇪🇸</span> ES
-              </button>
-              <div className="h-4 w-px bg-slate-200 mx-1"></div>
+            <div className="flex flex-col items-end gap-1.5">
               {user ? (
-                <div className="flex items-center gap-3 ml-2">
+                <div className="flex items-center gap-3">
                   <div className="flex flex-col items-end">
                     <span className="text-xs font-medium text-slate-900 max-w-[80px] sm:max-w-[120px] truncate" title={user.email || ''}>
                       {user.email?.split('@')[0]}
@@ -318,7 +305,7 @@ export default function App() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 ml-2">
+                <div className="flex items-center gap-3">
                   <span className="hidden md:inline-block text-[10px] text-slate-500 max-w-[250px] text-right leading-tight">
                     {t("To save data to the cloud, a new account must be created and a session started within the application.")}
                   </span>
@@ -331,6 +318,20 @@ export default function App() {
                   </button>
                 </div>
               )}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors ${language === 'en' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                >
+                  <span>🇺🇸</span> EN
+                </button>
+                <button
+                  onClick={() => setLanguage('es')}
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors ${language === 'es' ? 'bg-slate-100/80 text-slate-900' : 'text-slate-500 hover:bg-slate-50'}`}
+                >
+                  <span>🇪🇸</span> ES
+                </button>
+              </div>
             </div>
           </div>
           
