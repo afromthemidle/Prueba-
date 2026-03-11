@@ -7,7 +7,7 @@ import {
   AreaChart, Area, LineChart, Line
 } from 'recharts';
 import { useLanguage } from '../i18n/LanguageContext';
-import { Filter, Save, History, TrendingUp } from 'lucide-react';
+import { Filter, Save, History, TrendingUp, Maximize2, Minimize2 } from 'lucide-react';
 import { SunburstChart, SunburstNode } from './SunburstChart';
 
 interface DashboardStatsProps {
@@ -25,6 +25,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
   const [filterSector, setFilterSector] = useState<InvestmentSector | 'All'>('All');
   const [filterType, setFilterType] = useState<InvestmentType | 'All'>('All');
   const [filterCurrency, setFilterCurrency] = useState<string>('All');
+  const [expandedChart, setExpandedChart] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     let totalUSD = 0;
@@ -184,6 +185,44 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
     return null;
   };
 
+  const ChartCard = ({ id, title, children, heightClass = "h-[300px]" }: { id: string, title: string, children: React.ReactNode, heightClass?: string }) => {
+    const isExpanded = expandedChart === id;
+    
+    const content = (
+      <>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">{title}</h3>
+          <button 
+            onClick={() => setExpandedChart(isExpanded ? null : id)} 
+            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+            title={isExpanded ? t("Minimize") : t("Maximize")}
+          >
+            {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+          </button>
+        </div>
+        <div className={isExpanded ? "h-[calc(100vh-150px)] min-h-[400px] w-full" : `${heightClass} w-full`}>
+          {children}
+        </div>
+      </>
+    );
+
+    if (isExpanded) {
+      return (
+        <div className="fixed inset-0 z-[100] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-white w-full max-w-6xl max-h-screen overflow-hidden rounded-3xl shadow-2xl border border-slate-200 p-6 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            {content}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col">
+        {content}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 pb-20">
       {/* Save State Action */}
@@ -271,201 +310,180 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       {historyChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Net Worth Chart */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-            <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Total Net Worth History")}</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis 
-                    dataKey="date" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                    dy={10}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    width={60}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), t("Total Net Worth")]}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="total" 
-                    stroke="#4f46e5" 
-                    strokeWidth={3}
-                    fillOpacity={1} 
-                    fill="url(#colorTotal)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <ChartCard id="history-total" title={t("Total Net Worth History")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  width={60}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [formatCurrency(value), t("Total Net Worth")]}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="total" 
+                  stroke="#4f46e5" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorTotal)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
           {/* Growth Percentage Chart */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-            <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Growth Percentage")}</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis 
-                    dataKey="date" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                    dy={10}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                    tickFormatter={(value) => `${value}%`}
-                    width={40}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`${value}%`, t("Growth")]}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="growthPercentage" 
-                    stroke="#10b981" 
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: '#10b981', strokeWidth: 0 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <ChartCard id="history-growth" title={t("Growth Percentage")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={historyChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  dy={10}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(value) => `${value}%`}
+                  width={40}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}%`, t("Growth")]}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="growthPercentage" 
+                  stroke="#10b981" 
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: '#10b981', strokeWidth: 0 }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </div>
       )}
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sector Distribution */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Sector")}</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats.sectorData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {stats.sectorData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <ChartCard id="sector" title={t("Distribution by Sector")}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={stats.sectorData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {stats.sectorData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
         {/* Type Distribution */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Fixed vs Variable Income")}</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats.typeData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {stats.typeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#10b981', '#6366f1'][index % 2]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <ChartCard id="type" title={t("Fixed vs Variable Income")}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={stats.typeData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {stats.typeData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={['#10b981', '#6366f1'][index % 2]} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
         {/* Currency Distribution */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Currency / Asset")}</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats.currencyData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {stats.currencyData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#10b981'][index % 3]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <ChartCard id="currency" title={t("Distribution by Currency / Asset")}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={stats.currencyData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {stats.currencyData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={['#f59e0b', '#3b82f6', '#10b981'][index % 3]} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend formatter={(value) => <span className="text-slate-700">{t(value)}</span>} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
         {/* Country Distribution */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-          <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Distribution by Country")}</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.countryData} layout="vertical" margin={{ top: 5, right: 100, left: 0, bottom: 5 }}>
-                <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} width={80} />
-                <Tooltip cursor={{ fill: '#f1f5f9' }} content={<CustomTooltip />} />
-                <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={24}>
-                  <LabelList 
-                    dataKey="value" 
-                    position="right" 
-                    formatter={(value: number) => `${formatCurrency(value)} (${stats.totalUSD > 0 ? ((value / stats.totalUSD) * 100).toFixed(1) : 0}%)`} 
-                    fill="#64748b" 
-                    fontSize={12} 
-                    fontWeight={500}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <ChartCard id="country" title={t("Distribution by Country")}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={stats.countryData} layout="vertical" margin={{ top: 5, right: 100, left: 10, bottom: 5 }}>
+              <XAxis type="number" hide />
+              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} width={120} interval={0} />
+              <Tooltip cursor={{ fill: '#f1f5f9' }} content={<CustomTooltip />} />
+              <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={24}>
+                <LabelList 
+                  dataKey="value" 
+                  position="right" 
+                  formatter={(value: number) => `${formatCurrency(value)} (${stats.totalUSD > 0 ? ((value / stats.totalUSD) * 100).toFixed(1) : 0}%)`} 
+                  fill="#64748b" 
+                  fontSize={12} 
+                  fontWeight={500}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
       </div>
 
       {/* Sunburst Chart */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
-        <h3 className="text-sm font-semibold text-slate-900 mb-6 uppercase tracking-wider">{t("Portfolio Hierarchy (Country > Type > Investment)")}</h3>
-        <div className="h-[500px] w-full">
-          <SunburstChart data={stats.sunburstData} />
-        </div>
-      </div>
+      <ChartCard id="sunburst" title={t("Portfolio Hierarchy (Country > Type > Investment)")} heightClass="h-[500px]">
+        <SunburstChart data={stats.sunburstData} />
+      </ChartCard>
 
       {/* Top Investments Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
