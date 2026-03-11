@@ -79,13 +79,33 @@ export function SunburstChart({ data }: SunburstChartProps) {
       baseColor.l += (node.depth - 1) * 0.08; // Lighter as it goes deeper
       const fill = baseColor.toString();
 
+      const percentageNum = totalValue > 0 ? ((node.value || 0) / totalValue) * 100 : 0;
+      const percentage = percentageNum.toFixed(1);
+      
+      // Calculate text transform
+      const [x, y] = arc.centroid(node);
+      
+      // Calculate angle in degrees
+      const angle = (node.x0 + node.x1) / 2 * 180 / Math.PI - 90;
+      
+      // Keep text upright
+      const rotate = angle > 90 ? angle - 180 : angle;
+      
+      // Only show text if the slice is large enough (e.g., > 2.5% of total)
+      const showText = percentageNum > 2.5;
+
       return {
         id: `${node.data.name}-${i}`,
         d: arc(node) || '',
         fill,
         name: node.data.name,
         value: node.value || 0,
-        depth: node.depth
+        depth: node.depth,
+        percentage,
+        x,
+        y,
+        rotate,
+        showText
       };
     });
 
@@ -109,29 +129,41 @@ export function SunburstChart({ data }: SunburstChartProps) {
         className="max-w-full h-auto font-sans"
       >
         {paths.map((p) => (
-          <path
-            key={p.id}
-            d={p.d}
-            fill={p.fill}
-            fillOpacity={0.8}
-            stroke="#ffffff"
-            strokeWidth={1.5}
-            className="transition-all duration-200 hover:fill-opacity-100 cursor-pointer"
-            onMouseEnter={(e) => {
-              const percentage = totalValue > 0 ? ((p.value / totalValue) * 100).toFixed(1) : '0';
-              setTooltip({
-                visible: true,
-                x: e.clientX,
-                y: e.clientY,
-                name: p.name,
-                value: p.value,
-                percentage
-              });
-            }}
-            onMouseMove={(e) => {
-              setTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
-            }}
-          />
+          <g key={p.id}>
+            <path
+              d={p.d}
+              fill={p.fill}
+              fillOpacity={0.8}
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              className="transition-all duration-200 hover:fill-opacity-100 cursor-pointer"
+              onMouseEnter={(e) => {
+                setTooltip({
+                  visible: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  name: p.name,
+                  value: p.value,
+                  percentage: p.percentage
+                });
+              }}
+              onMouseMove={(e) => {
+                setTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
+              }}
+            />
+            {p.showText && (
+              <text
+                transform={`translate(${p.x}, ${p.y}) rotate(${p.rotate})`}
+                dy="0.35em"
+                textAnchor="middle"
+                fill="#ffffff"
+                className="text-[10px] font-semibold pointer-events-none select-none"
+                style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.6)' }}
+              >
+                {p.percentage}%
+              </text>
+            )}
+          </g>
         ))}
         {/* Center text */}
         <text textAnchor="middle" fill="#64748b" fontSize="12" dy="-0.5em" className="pointer-events-none select-none">{t("Total")}</text>

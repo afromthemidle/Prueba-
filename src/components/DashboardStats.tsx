@@ -92,7 +92,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       .filter(inv => getDaysLeft(inv.maturityDate!) >= 0)
       .slice(0, 5);
 
-    // Build hierarchical data for Sunburst chart (Country -> Type -> Investment)
+    // Build hierarchical data for Sunburst chart (Country -> Type -> Currency -> Investment)
     const sunburstRoot: SunburstNode = { name: 'Portfolio', children: [] };
     const countryMap = new Map<string, SunburstNode>();
 
@@ -108,7 +108,14 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
         countryNode.children!.push(typeNode);
       }
       
-      typeNode.children!.push({
+      const currency = inv.currency || 'USD';
+      let currencyNode = typeNode.children!.find(c => c.name === currency);
+      if (!currencyNode) {
+        currencyNode = { name: currency, children: [] };
+        typeNode.children!.push(currencyNode);
+      }
+      
+      currencyNode.children!.push({
         name: inv.name || 'Unnamed',
         value: inv.amountUSD
       });
@@ -481,7 +488,7 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       </div>
 
       {/* Sunburst Chart */}
-      <ChartCard id="sunburst" title={t("Portfolio Hierarchy (Country > Type > Investment)")} heightClass="h-[500px]">
+      <ChartCard id="sunburst" title={t("Portfolio Hierarchy (Country > Type > Currency > Investment)")} heightClass="h-[500px]">
         <SunburstChart data={stats.sunburstData} />
       </ChartCard>
 
