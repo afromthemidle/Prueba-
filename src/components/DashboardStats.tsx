@@ -77,6 +77,8 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
     });
 
     const avgInterest = totalUSD > 0 ? totalWeightedInterest / totalUSD : 0;
+    const totalYearlyEarnings = totalWeightedInterest;
+    const totalMonthlyEarnings = totalYearlyEarnings / 12;
 
     // Format data for charts
     const formatChartData = (data: Record<string, number>) => 
@@ -150,6 +152,8 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
     return {
       totalUSD,
       avgInterest,
+      totalYearlyEarnings,
+      totalMonthlyEarnings,
       countryData: formatChartData(byCountry),
       currencyData: formatChartData(byCurrency),
       typeData: formatChartData(byType),
@@ -326,15 +330,27 @@ export function DashboardStats({ investments, amounts, prices, snapshots, onSave
       </div>
 
       {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/60">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Total Net Worth")}</p>
-          <p className="text-4xl font-light text-slate-900 tracking-tight font-mono">{formatCurrency(stats.totalUSD)}</p>
+          <p className="text-3xl font-light text-slate-900 tracking-tight font-mono">{formatCurrency(stats.totalUSD)}</p>
         </div>
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200/60">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Average Weighted Interest")}</p>
-          <p className={`text-4xl font-light tracking-tight font-mono ${stats.avgInterest >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Avg. Interest")}</p>
+          <p className={`text-3xl font-light tracking-tight font-mono ${stats.avgInterest >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
             {formatPercent(stats.avgInterest)}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Yearly Earnings")}</p>
+          <p className={`text-3xl font-light tracking-tight font-mono ${stats.totalYearlyEarnings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+            {formatCurrency(stats.totalYearlyEarnings)}
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Monthly Earnings")}</p>
+          <p className={`text-3xl font-light tracking-tight font-mono ${stats.totalMonthlyEarnings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+            {formatCurrency(stats.totalMonthlyEarnings)}
           </p>
         </div>
       </div>
