@@ -49,6 +49,8 @@ export const translations: Translations = {
   "e.g. Spain, USA, Global": { en: "e.g. Spain, USA, Global", es: "ej. España, EE.UU., Global" },
   "Currency": { en: "Currency", es: "Divisa" },
   "Any Currency": { en: "Any Currency", es: "Cualquier Divisa" },
+  "Minimum Annual Yield (%)": { en: "Minimum Annual Yield (%)", es: "Rendimiento Anual Mínimo (%)" },
+  "e.g. 5": { en: "e.g. 5", es: "ej. 5" },
   "Generating Ideas...": { en: "Generating Ideas...", es: "Generando Ideas..." },
   "Get Suggestions": { en: "Get Suggestions", es: "Obtener Sugerencias" },
   "Recommended For You": { en: "Recommended For You", es: "Recomendado para ti" },

@@ -21,6 +21,7 @@ export function AISuggestions() {
   const [type, setType] = useState<InvestmentType | 'Any'>('Any');
   const [country, setCountry] = useState<string>('');
   const [currency, setCurrency] = useState<'USD' | 'EUR' | 'Any'>('Any');
+  const [minYield, setMinYield] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +42,7 @@ export function AISuggestions() {
       ${type !== 'Any' ? `Type preference: ${type} income.` : ''}
       ${country ? `Country preference: ${country}.` : ''}
       ${currency !== 'Any' ? `Currency preference: ${currency}.` : ''}
+      ${minYield ? `Minimum expected annual yield: ${minYield}%.` : ''}
       Provide realistic, currently available options (e.g., specific platforms, bonds, P2P lending, ETFs, savings accounts).
       Ensure the interest rates are realistic annual percentages.`;
 
@@ -145,6 +147,18 @@ export function AISuggestions() {
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
           </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t("Minimum Annual Yield (%)")}</label>
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder={t("e.g. 5")}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:border-slate-400 bg-slate-50 hover:bg-white transition-colors text-sm"
+            value={minYield}
+            onChange={(e) => setMinYield(e.target.value)}
+          />
         </div>
       </div>
 
