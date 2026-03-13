@@ -27,6 +27,8 @@ export interface PortfolioSnapshot {
   id: string;
   date: string;
   totalNetWorth: number;
+  yearlyEarnings?: number;
+  monthlyEarnings?: number;
   investments: Investment[];
   amounts: Record<string, number>;
 }

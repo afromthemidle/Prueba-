@@ -123,6 +123,7 @@ export const translations: Translations = {
   "No historical data yet": { en: "No historical data yet", es: "Aún no hay datos históricos" },
   "Click the button above to save your first portfolio snapshot and start tracking your wealth growth.": { en: "Click the button above to save your first portfolio snapshot and start tracking your wealth growth.", es: "Haz clic en el botón de arriba para guardar tu primer estado y empezar a rastrear el crecimiento de tu patrimonio." },
   "Total Net Worth History": { en: "Total Net Worth History", es: "Historial del Patrimonio Neto" },
+  "Earnings History": { en: "Earnings History", es: "Historial de Ganancias" },
   "Yearly Earnings": { en: "Yearly Earnings", es: "Ganancias Anuales" },
   "Monthly Earnings": { en: "Monthly Earnings", es: "Ganancias Mensuales" },
   "Avg. Interest": { en: "Avg. Interest", es: "Interés Promedio" },

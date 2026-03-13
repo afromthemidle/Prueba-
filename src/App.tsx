@@ -250,16 +250,26 @@ export default function App() {
   const handleSaveSnapshot = () => {
     setIsSavingSnapshot(true);
     try {
-      const totalNetWorth = investments.reduce((sum, inv) => {
+      let totalNetWorth = 0;
+      let totalWeightedInterest = 0;
+
+      investments.forEach(inv => {
         const amount = amounts[inv.id] || 0;
         const price = prices[inv.currency || 'USD'] || 1;
-        return sum + (amount * price);
-      }, 0);
+        const amountUSD = amount * price;
+        totalNetWorth += amountUSD;
+        totalWeightedInterest += amountUSD * inv.rate;
+      });
+
+      const yearlyEarnings = totalWeightedInterest;
+      const monthlyEarnings = yearlyEarnings / 12;
 
       const newSnapshot: PortfolioSnapshot = {
         id: crypto.randomUUID(),
         date: new Date().toISOString(),
         totalNetWorth,
+        yearlyEarnings,
+        monthlyEarnings,
         investments: [...investments],
         amounts: { ...amounts }
       };
